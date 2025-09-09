@@ -3,266 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6th Grade Math</title>
+    <title>गणित का खेल - 10th Grade Math Adventures</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom styles for the gamified platform */
         body {
             font-family: cursive, sans-serif; /* Fun, rounded system font */
-            background: linear-gradient(to bottom, #6dd5ed, #2193b0); /* Sky blue gradient */
+            background: linear-gradient(to bottom, #2c3e50, #4ca1af); /* A slightly more mature gradient */
             color: #333;
-            overflow: hidden; /* Hide scrollbars to keep the scene clean */
+            overflow: hidden;
             margin: 0;
             padding: 0;
         }
         
         /* Language-specific fonts */
         .lang-en { font-family: cursive, sans-serif; }
-        .lang-or { font-family: sans-serif; font-weight: 700; }
-        .lang-or-body { font-family: sans-serif; font-weight: 400; }
-        .lang-hi { font-family: sans-serif; font-weight: 700; }
-        .lang-hi-body { font-family: sans-serif; font-weight: 400; }
+        .lang-or, .lang-hi { font-family: sans-serif; font-weight: 700; }
+        .lang-or-body, .lang-hi-body { font-family: sans-serif; font-weight: 400; }
 
         #background-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: -1;
         }
 
         .start-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            background: linear-gradient(to bottom, #6dd5ed, #2193b0);
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; text-align: center;
+            background: linear-gradient(to bottom, #2c3e50, #4ca1af);
+            color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            transition: opacity 0.5s ease-out;
         }
 
-        .start-screen h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
+        .start-screen h1 { font-size: 4rem; margin-bottom: 1rem; }
 
         .play-now-btn {
-            font-size: 2rem;
-            padding: 1rem 3rem;
-            border-radius: 50px;
-            background: #ff6b6b;
-            color: white;
-            border: 5px solid white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            font-size: 2rem; padding: 1rem 3rem; border-radius: 50px;
+            background: #f39c12; color: white; border: 5px solid white; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-
-        .play-now-btn:hover {
-            transform: scale(1.1);
-            background: #ff4757;
-        }
+        .play-now-btn:hover { transform: scale(1.1); background: #e67e22; }
         
-        #app-container {
-            display: none; /* Hidden initially */
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
+        #app-container { opacity: 0; transition: opacity 1s ease-in-out; }
 
         .chapter-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px);
             border: 2px solid rgba(255, 255, 255, 0.5);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            text-align: center;
-            padding: 1.5rem;
-            border-radius: 1.5rem;
+            cursor: pointer; text-align: center; padding: 1.5rem; border-radius: 1.5rem;
             box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
-        
-        .chapter-card:hover {
-            transform: translateY(-10px) scale(1.03);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        
-        .chapter-title {
-            color: #fff;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-        }
+        .chapter-card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .chapter-title { color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
 
         .modal { background: rgba(0, 0, 0, 0.6); }
         .modal-content {
-             background: white;
-             border-radius: 1.5rem;
-             border: 5px solid #ffca28;
-             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: white; border-radius: 1.5rem; border: 5px solid #f1c40f;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         /* Generic Game Styles */
         .game-option-btn {
-            background-color: #f0f0f0;
-            border: 2px solid #ddd;
+            background-color: #f0f0f0; border: 2px solid #ddd;
             transition: all 0.2s ease;
         }
         .game-option-btn:hover {
-            transform: scale(1.05);
-            border-color: #ffca28;
-            background-color: #fffbe6;
-        }
-
-        /* Detective Math Game Style */
-        .clue-box {
-            background: #fffbe6;
-            border: 2px dashed #fcd34d;
-            padding: 1rem;
-            border-radius: 0.75rem;
+            transform: scale(1.05); border-color: #f1c40f; background-color: #fffbe6;
         }
         
-        /* Space Invaders Game Style */
-        #invaders-game-area {
-            position: relative;
-            height: 400px;
-            background: #000 url('https://www.transparenttextures.com/patterns/stardust.png');
+        /* Animation for floating islands */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating-island {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Equation Balancer */
+        .equation-box {
+            background-color: #eefbff;
+            border-left: 5px solid #3498db;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Quadratic Catapult */
+        .catapult-game {
+            background: #d4e6f1 url('https://www.transparenttextures.com/patterns/light-grass.png');
             border-radius: 1rem;
-            overflow: hidden;
-        }
-        .invader {
-            position: absolute;
-            color: #39ff14; /* Lime green */
-            font-size: 1.5rem;
-            animation: fall 10s linear infinite;
-            cursor: pointer;
-        }
-        .player-ship {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 30px;
-            background-color: #f9ca24;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        }
-
-        /* Time Traveler Game */
-        .number-line {
-            width: 100%;
-            height: 50px;
-            background: #eee;
-            border-radius: 25px;
-            margin: 2rem 0;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 20px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .time-traveler {
-            position: absolute;
-            font-size: 2.5rem;
-            transition: left 0.5s ease-in-out;
-        }
-        
-        /* Pizza Party Game */
-        .pizza-slice {
-            fill: #ffdd59;
-            stroke: #d35400;
-            stroke-width: 4;
-            transition: fill 0.3s ease;
-            cursor: pointer;
-        }
-        .pizza-slice:hover {
-            fill: #feca57;
-        }
-        .pizza-crust {
-            fill: #d35400;
-        }
-
-        /* Market Mayhem Game */
-        .item-card {
-            background-color: #e0f2fe;
-            border: 2px solid #7dd3fc;
-        }
-
-        /* Mountain Climber Game */
-        .mountain-bg {
-            background: linear-gradient(to top, #a8e063, #56ab2f);
             height: 300px;
-            position: relative;
-            border-radius: 1rem;
-            overflow: hidden;
+            border: 2px solid #a9cce3;
         }
-        .climber {
-            position: absolute;
-            left: 50%;
+        .target {
+            position: absolute; bottom: 0;
+            font-size: 24px;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
             transform: translateX(-50%);
-            transition: bottom 0.5s ease-in-out;
-            font-size: 2rem;
         }
-        .level-marker {
-            position: absolute;
-            width: 100%;
-            left: 0;
-            border-top: 1px dashed rgba(255,255,255,0.5);
-            color: white;
-            font-size: 0.8rem;
-            padding-left: 5px;
-        }
-
-        /* Polygon Puzzle Game */
-        .shape-canvas {
-            border: 2px dashed #ccc;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        #catapult-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
         }
         
-        /* Variable Voyager Game */
-        .voyager-bg {
-            background: #000020 url('https://www.transparenttextures.com/patterns/stardust.png');
-            height: 250px;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: white;
-            text-shadow: 0 0 10px #00ffff;
-        }
-
-        /* Garden Architect Game */
-        .garden-plot {
-            background-color: #8B4513;
-            border: 5px solid #5C2E00;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .dimension-label {
-            position: absolute;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 8px;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        /* Blueprint Builder Game */
-        .tool-icon {
-            font-size: 4rem;
-        }
-
-
-        @keyframes fall {
-            from { top: -30px; }
-            to { top: 100%; }
+        .solution-box {
+            background-color: #fff5f5;
+            border-left: 5px solid #ef4444;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 0.5rem;
         }
 
     </style>
@@ -272,18 +122,23 @@
     <div id="background-container"></div>
 
     <div id="start-screen" class="start-screen">
-        <h1 class="lang-or">ଷଷ୍ଠ ଶ୍ରେଣୀ ଗଣିତ</h1>
-        <p class="text-xl mb-12 lang-or-body">ସାହସିକତାର ପରବର୍ତ୍ତୀ ସ୍ତର!</p>
-        <button id="play-now-btn" class="play-now-btn lang-or">ଏବେ ଖେଳନ୍ତୁ</button>
+        <div class="absolute top-8 right-8 flex items-center space-x-2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-md z-10">
+            <button id="start-lang-en-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">English</button>
+            <button id="start-lang-or-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">ଓଡ଼ିଆ</button>
+            <button id="start-lang-hi-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">हिन्दी</button>
+        </div>
+        <h1 class="lang-en">10th Grade Math</h1>
+        <p class="text-xl mb-12 lang-en">The Next Level of Adventure!</p>
+        <button id="play-now-btn" class="play-now-btn lang-en">Play Now</button>
     </div>
 
     <!-- Main Application Container -->
     <div id="app-container" class="hidden min-h-screen p-4 sm:p-6 lg:p-8">
         <header class="flex justify-between items-center mb-8">
-            <h1 id="platform-title" class="text-3xl md:text-4xl font-bold text-white text-shadow">ଷଷ୍ଠ ଶ୍ରେଣୀ ଗଣିତ</h1>
+            <h1 id="platform-title" class="text-3xl md:text-4xl font-bold text-white text-shadow"></h1>
             <div class="flex items-center space-x-2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-md">
                 <button id="lang-en-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">English</button>
-                <button id="lang-or-btn" class="px-4 py-2 rounded-full text-sm font-semibold bg-emerald-500 text-white">ଓଡ଼ିଆ</button>
+                <button id="lang-or-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">ଓଡ଼ିଆ</button>
                 <button id="lang-hi-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">हिन्दी</button>
             </div>
         </header>
@@ -306,7 +161,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- DYNAMIC BACKGROUND GENERATION ---
             function createBackground() {
                 const bgContainer = document.getElementById('background-container');
                 const svgNS = "http://www.w3.org/2000/svg";
@@ -314,19 +168,17 @@
                 svg.setAttribute('width', '100%');
                 svg.setAttribute('height', '100%');
                 svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-
                 // Clouds
                 for (let i = 0; i < 15; i++) {
                     const circle = document.createElementNS(svgNS, "circle");
                     circle.setAttribute('cx', `${Math.random() * 100}%`);
                     circle.setAttribute('cy', `${Math.random() * 40}%`);
                     circle.setAttribute('r', `${Math.random() * 50 + 20}`);
-                    circle.setAttribute('fill', 'rgba(255, 255, 255, 0.7)');
+                    circle.setAttribute('fill', 'rgba(255, 255, 255, 0.2)');
                     circle.style.filter = 'blur(15px)';
                     svg.appendChild(circle);
                 }
-
-                // Floating Islands
+                // Floating Islands - NOW ANIMATED!
                 const islandColors = ['#8B4513', '#A0522D', '#D2691E'];
                 for (let i = 0; i < 5; i++) {
                     const path = document.createElementNS(svgNS, "path");
@@ -336,826 +188,512 @@
                     path.setAttribute('d', d);
                     path.setAttribute('fill', islandColors[i % 3]);
                     path.style.filter = 'drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4))';
+                    path.classList.add('floating-island'); // Add class for animation
+                    path.style.animationDelay = `${i * 1.2}s`; // Stagger animations
                     svg.appendChild(path);
                 }
                 bgContainer.appendChild(svg);
             }
 
-            // --- DATA & STATE MANAGEMENT ---
-            let currentLanguage = 'or';
+            let currentLanguage = 'hi'; // Default to Hindi
             const textContent = {
-                platformTitle: { en: '6th Grade Math', or: 'ଷଷ୍ଠ ଶ୍ରେଣୀ ଗଣିତ', hi: 'कक्षा 6 गणित' },
+                platformTitle: { en: '10th Grade Math', or: 'ଦଶମ ଶ୍ରେଣୀ ଗଣିତ', hi: 'କକ୍ଷା 10 ଗଣିତ' },
                 chapters: [
-                    { id: 'ch1', title: { en: 'Knowing Our Numbers', or: 'ସଂଖ୍ୟାମାନଙ୍କୁ ଜାଣିବା', hi: 'अपनी संख्याओं को जानना' }, color: 'bg-blue-500', units: [
-                        { id: 'u1.1', title: { en: 'Number Detective', or: 'ସଂଖ୍ୟା ଗୁପ୍ତଚର', hi: 'संख्या जासूस' }, game: 'detectiveMath' },
-                        { id: 'u1.2', title: { en: 'Place Value Treasure Hunt', or: 'ସ୍ଥାନୀୟ ମାନର ସନ୍ଧାନ', hi: 'स्थानीय मान खजाना खोज' }, game: 'treasureHunt' }
-                    ]},
-                    { id: 'ch2', title: { en: 'Playing with Numbers', or: 'ସଂଖ୍ୟା ସହ ଖେଳ', hi: 'संख्याओं के साथ खेलना' }, color: 'bg-green-500', units: [
-                        { id: 'u2.1', title: { en: 'Divisibility Space Invaders', or: 'ବିଭାଜ୍ୟତା ମହାକାଶ ଆକ୍ରମଣ', hi: 'विभाज्यता स्पेस आक्रमण' }, game: 'spaceInvaders' },
-                        { id: 'u2.2', title: { en: 'Factor Escape Room', or: 'ଗୁଣନୀୟକ ରହସ୍ୟ', hi: 'गुणनखंड एस्केप रूम' }, game: 'escapeRoom' }
-                    ]},
-                    { id: 'ch3', title: { en: 'Basic Geometrical Ideas', or: 'ଜ୍ୟାମିତିରେ ମୌଳିକ ଧାରଣା', hi: 'बुनियादी ज्यामितीय विचार' }, color: 'bg-yellow-500', units: [
-                         { id: 'u3.1', title: { en: 'Shape Magic', or: 'ଆକୃତିର ଯାଦୁ', hi: 'आकृति का जादू' }, game: 'shapeMagic' }
-                    ]},
-                    { id: 'ch4', title: { en: 'Natural Numbers', or: 'ସ୍ଵାଭାବିକ ସଂଖ୍ୟା', hi: 'प्राकृतिक संख्याएं' }, color: 'bg-purple-500', units: [
-                         { id: 'u4.1', title: { en: 'Time Traveler', or: 'ସମୟ ଯାତ୍ରା', hi: 'समय यात्री' }, game: 'timeTraveler' }
-                    ]},
-                    { id: 'ch5', title: { en: 'Fractions', or: 'ଭଗ୍ନସଂଖ୍ୟା', hi: 'भिन्न' }, color: 'bg-pink-500', units: [
-                        { id: 'u5.1', title: { en: 'Pizza Party', or: 'ପିଜା ପାର୍ଟି', hi: 'पिज्जा पार्टी' }, game: 'pizzaParty' }
-                    ]},
-                    { id: 'ch6', title: { en: 'Decimal Numbers', or: 'ଦଶମିକ ସଂଖ୍ୟା', hi: 'दशमलव संख्याएं' }, color: 'bg-indigo-500', units: [
-                        { id: 'u6.1', title: { en: 'Decimal Dash', or: 'ଦଶମିକ ଦୌଡ଼', hi: 'दशमलव डैश' }, game: 'decimalDash' }
-                    ]},
-                    { id: 'ch7', title: { en: 'Commercial Mathematics', or: 'ବ୍ୟାବସାୟିକ ଗଣିତ', hi: 'व्यावसायिक गणित' }, color: 'bg-red-500', units: [
-                        { id: 'u7.1', title: { en: 'Market Mayhem', or: 'ବଜାରର ମାୟା', hi: 'बाजार की माया' }, game: 'marketMayhem' }
-                    ]},
-                    { id: 'ch8', title: { en: 'Integers', or: 'ପୂର୍ଣ୍ଣ ସଂଖ୍ୟା', hi: 'पूर्णांक' }, color: 'bg-orange-500', units: [
-                        { id: 'u8.1', title: { en: 'Mountain Climber', or: 'ପର୍ବତାରୋହୀ', hi: 'पर्वतारोही' }, game: 'mountainClimber'}
-                    ]},
-                    { id: 'ch9', title: { en: 'Geometrical Shapes on a Plane', or: 'ସମତଳ ଉପରିସ୍ଥ ଜ୍ୟାମିତିକ ଆକୃତି', hi: 'एक तल पर ज्यामितीय आकृतियाँ' }, color: 'bg-cyan-500', units: [
-                        { id: 'u9.1', title: { en: 'Polygon Puzzle', or: 'ବହୁଭୁଜ ପଜଲ୍', hi: 'बहुभुज पहेली' }, game: 'polygonPuzzle'}
-                    ]},
-                    { id: 'ch10', title: { en: 'Introduction to Algebra', or: 'ବୀଜଗଣିତ ସହିତ ପରିଚିତି', hi: 'बीजगणित का परिचय' }, color: 'bg-lime-500', units: [
-                        { id: 'u10.1', title: { en: 'Variable Voyager', or: 'ବେରିଏବଲ୍ ଭଏଜର୍', hi: 'चर वोयाजर' }, game: 'variableVoyager'}
-                    ]},
-                    { id: 'ch11', title: { en: 'Mensuration', or: 'ପରିମିତି', hi: 'क्षेत्रमिति' }, color: 'bg-fuchsia-500', units: [
-                        { id: 'u11.1', title: { en: 'Garden Architect', or: 'ବଗିଚା ନିର୍ମାତା', hi: 'बगीचा निर्माता' }, game: 'gardenArchitect'}
-                    ]},
-                    { id: 'ch12', title: { en: 'Data Handling and Organization', or: 'ତଥ୍ୟ ପରିଚାଳନା ଓ ସଂରଚନା', hi: 'डेटा प्रबंधन और संगठन' }, color: 'bg-rose-500', units: [
-                        { id: 'u12.1', title: { en: 'Fruit Stand Frenzy', or: 'ଫଳ ଦୋକାନ ମଜା', hi: 'फल दुकान का मज़ा' }, game: 'fruitStandFrenzy'}
-                    ]},
-                    { id: 'ch13', title: { en: 'Geometrical Constructions', or: 'ଜ୍ୟାମିତିକ ଅଙ୍କନ', hi: 'ज्यामितीय निर्माण' }, color: 'bg-sky-500', units: [
-                        { id: 'u13.1', title: { en: 'Blueprint Builder', or: 'ନକ୍ସା ନିର୍ମାତା', hi: 'ब्लूप्रिंट बिल्डर' }, game: 'blueprintBuilder'}
-                    ]}
+                    // Algebra
+                    { id: 'alg1', title: { en: 'Linear Simultaneous Equations', or: 'ସରଳ ସହସମୀକରଣ', hi: 'रैखिक युगपत समीकरण' }, color: 'bg-blue-500', units: [{ id: 'u_alg1', game: 'equationBalancer' }] },
+                    { id: 'alg2', title: { en: 'Quadratic Equation', or: 'ଦ୍ବିଘାତ ସମୀକରଣ', hi: 'द्विघात समीकरण' }, color: 'bg-green-500', units: [{ id: 'u_alg2', game: 'quadraticCatapult' }] },
+                    { id: 'alg3', title: { en: 'Arithmetic Progression', or: 'ସମାନ୍ତର ପ୍ରଗତି', hi: 'समांतर श्रेढ़ी' }, color: 'bg-yellow-500', units: [{ id: 'u_alg3', game: 'progressionPath' }] },
+                    { id: 'alg4', title: { en: 'Probability', or: 'ସମ୍ଭାବ୍ୟତା', hi: 'प्रायिकता' }, color: 'bg-purple-500', units: [{ id: 'u_alg4', game: 'probabilitySpinner' }] },
+                    { id: 'alg5', title: { en: 'Statistics', or: 'ପରିସଂଖ୍ୟାନ', hi: 'सांख्यिकी' }, color: 'bg-pink-500', units: [{ id: 'u_alg5', game: 'dataDetective' }] },
+                    { id: 'alg6', title: { en: 'Coordinate Geometry', or: 'ସ୍ଥାନାଙ୍କ ଜ୍ୟାମିତି', hi: 'निर्देशांक ज्यामिति' }, color: 'bg-indigo-500', units: [{ id: 'u_alg6', game: 'distanceDash' }] },
+                    { id: 'alg7', title: { en: 'Road Safety Education', or: 'ସଡ଼କ ସୁରକ୍ଷା ଶିକ୍ଷା', hi: 'सड़क सुरक्षा शिक्षा' }, color: 'bg-red-500', units: [{ id: 'u_alg7', game: 'safeStopChallenge' }] },
+                    // Geometry
+                    { id: 'geo1', title: { en: 'Similarity', or: 'ଜ୍ୟାମିତିରେ ସାଦୃଶ୍ୟ', hi: 'समरूपता' }, color: 'bg-orange-500', units: [{ id: 'u_geo1', game: 'scaleFactorSurveyor' }] },
+                    { id: 'geo2', title: { en: 'Circle', or: 'ବୃତ୍ତ', hi: 'वृत्त' }, color: 'bg-cyan-500', units: [{ id: 'u_geo2', game: 'arcAngleArcher' }] },
+                    { id: 'geo3', title: { en: 'Tangent to a Circle', or: 'ବୃତ୍ତର ସ୍ପର୍ଶକ', hi: 'वृत्त की स्पर्श रेखा' }, color: 'bg-lime-500', units: [{ id: 'u_geo3', game: 'tangentTracer' }] },
+                    { id: 'geo4', title: { en: 'Trigonometry', or: 'ତ୍ରିକୋଣମିତି', hi: 'त्रिकोणमिति' }, color: 'bg-fuchsia-500', units: [{ id: 'u_geo4', game: 'trigTower' }] },
+                    { id: 'geo5', title: { en: 'Mensuration', or: 'ପରିମିତି', hi: 'क्षेत्रमिति' }, color: 'bg-rose-500', units: [{ id: 'u_geo5', game: 'volumeVoyage' }] },
+                    { id: 'geo6', title: { en: 'Constructions', or: 'ଅଙ୍କନ', hi: 'रचनाएँ' }, color: 'bg-sky-500', units: [{ id: 'u_geo6', game: 'constructionCrew' }] }
                 ]
             };
             
             const gameData = {
-                checkAnswer: { en: 'Check', or: 'ଯାଞ୍ଚ କରନ୍ତୁ', hi: 'जांचें' },
-                correct: { en: 'Brilliant!', or: 'ବହୁତ ବଢିଆ!', hi: 'बहुत बढ़िया!' },
-                tryAgain: { en: 'Not quite, try again!', or: 'ଭୁଲ ଅଛି, ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ!', hi: 'गलत है, फिर से कोशिश करें!' },
+                checkAnswer: { en: 'Check', or: 'ଯାଞ୍ଚ କରନ୍ତୁ', hi: 'जाँच करें' },
+                correct: { en: 'Correct!', or: 'ଠିକ୍ ଅଛି!', hi: 'सही है!' },
+                tryAgain: { en: 'Incorrect. Let\'s review!', or: 'ଭୁଲ ଅଛି। ଆସନ୍ତୁ ଦେଖିବା!', hi: 'गलत। आइए समीक्षा करें!' },
                 next: { en: 'Next', or: 'ପରବର୍ତ୍ତୀ', hi: 'अगला' },
-                detectiveMath: {
-                    instruction: { en: 'Detective, find the missing number in the sequence!', or: 'ଗୁପ୍ତଚର, ଏହି କ୍ରମରେ ଥିବା ହଜିଯାଇଥିବା ସଂଖ୍ୟାକୁ ଖୋଜନ୍ତୁ!', hi: 'जासूस, इस क्रम में लुप्त संख्या ज्ञात करें!' },
-                    caseFile: { en: 'Case File', or: 'କେସ୍ ଫାଇଲ୍', hi: 'केस फ़ाइल' }
+                hit: { en: 'Hit!', or: 'ହିଟ୍!', hi: 'निशाना लगा!' },
+                solutionTitle: { en: 'Here\'s the method:', or: 'ଏଠାରେ ପ୍ରଣାଳୀ ଦିଆଗଲା:', hi: 'यहाँ विधि है:' },
+                correctAnswerIs: { en: 'The correct answer is', or: 'ସଠିକ୍ ଉତ୍ତର ହେଉଛି', hi: 'सही उत्तर है' },
+                nextQuestion: { en: 'Next Question', or: 'ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ', hi: 'अगला प्रश्न' },
+                equationBalancer: { 
+                    instruction: { en: 'Find the values of X and Y to balance the equations!', or: 'ସମୀକରଣକୁ ସନ୍ତୁଳିତ କରିବା ପାଇଁ X ଏବଂ Yର ମୂଲ୍ୟ ଖୋଜନ୍ତୁ!', hi: 'समीकरणों को संतुलित करने के लिए X और Y का मान ज्ञात कीजिए!' },
+                    xEquals: { en: 'x =', or: 'x =', hi: 'x =' },
+                    yEquals: { en: 'y =', or: 'y =', hi: 'y =' }
                 },
-                treasureHunt: {
-                    instruction: { en: 'Brave adventurer, find the treasure! What digit is in the', or: 'ସାହସୀ ଅଭିଯାତ୍ରୀ, ଧନ ସନ୍ଧାନ କର! କେଉଁ ଅଙ୍କଟି ଏହି ସ୍ଥାନରେ ଅଛି', hi: 'बहादुर साहसी, खजाना ढूंढो! कौन सा अंक इस स्थान पर है' },
-                    place: {
-                        ones: { en: 'Ones place', or: 'ଏକକ ସ୍ଥାନରେ', hi: 'इकाई स्थान पर'},
-                        tens: { en: 'Tens place', or: 'ଦଶକ ସ୍ଥାନରେ', hi: 'दहाई स्थान पर'},
-                        hundreds: { en: 'Hundreds place', or: 'ଶତକ ସ୍ଥାନରେ', hi: 'सैकड़ा स्थान पर'},
-                        thousands: { en: 'Thousands place', or: 'ହଜାର ସ୍ଥାନରେ', hi: 'हजार स्थान पर' },
-                        tenThousands: { en: 'Ten Thousands place', or: 'ଅୟୁତ ସ୍ଥାନରେ', hi: 'दस हजार स्थान पर' },
-                        lakhs: { en: 'Lakhs place', or: 'ଲକ୍ଷ ସ୍ଥାନରେ', hi: 'लाख स्थान पर' }
-                    },
-                    inTheNumber: { en: 'in the number', or: 'ସଂଖ୍ୟାଟିରେ', hi: 'संख्या में' }
+                quadraticCatapult: { 
+                    instruction: { en: 'Find a root of the equation to launch the catapult and hit a target!', or: 'କେଟାପଲ୍ଟ ଲଞ୍ଚ କରିବା ଏବଂ ଲକ୍ଷ୍ୟକୁ ମାରିବା ପାଇଁ ସମୀକରଣର ଏକ ମୂଳ ଖୋଜନ୍ତୁ!', hi: 'गुलेल लॉन्च करने और लक्ष्य को भेदने के लिए समीकरण का एक मूल ज्ञात कीजिए!' }, 
+                    launch: { en: 'Launch!', or: 'ଲଞ୍ଚ କରନ୍ତୁ!', hi: 'लांच!' },
+                    rootLabel: { en: 'Root =', or: 'ମୂଳ =', hi: 'मूल =' }
                 },
-                spaceInvaders: {
-                    instruction: { en: 'Destroy the invaders that are multiples of', or: 'ଆକ୍ରମଣକାରୀଙ୍କୁ ନଷ୍ଟ କରନ୍ତୁ ଯେଉଁମାନେ ଏହାର ଗୁଣିତକ ଅଟନ୍ତି', hi: 'उन आक्रमणकारियों को नष्ट करें जो इसके गुणज हैं' },
-                    fire: { en: 'FIRE!', or: 'ଫାୟାର!', hi: 'फ़ायर!' }
+                progressionPath: { instruction: { en: 'Find the next number in the Arithmetic Progression to help the frog cross!', or: 'ଏରିଥମେଟିକ୍ ପ୍ରୋଗ୍ରେସନରେ ପରବର୍ତ୍ତୀ ସଂଖ୍ୟା ଖୋଜି ବେଙ୍ଗକୁ ପାରି ହେବାରେ ସାହାଯ୍ୟ କରନ୍ତୁ!', hi: 'मेंढक को पार करने में मदद करने के लिए समांतर श्रेढ़ी में अगली संख्या ज्ञात कीजिए!' } },
+                probabilitySpinner: { 
+                    instruction: { en: 'Find the probability of landing on Red. Simplify your fraction.', or: 'ଲାଲ୍ ଉପରେ ଅବତରଣ କରିବାର ସମ୍ଭାବନା ଖୋଜନ୍ତୁ | ଆପଣଙ୍କର ଭଗ୍ନାଂଶକୁ ସରଳ କରନ୍ତୁ |', hi: 'लाल पर आने की प्रायिकता ज्ञात कीजिए। अपने भिन्न को सरल कीजिए।' }, 
+                    numerator: { en: 'Numerator', or: 'ଲବ', hi: 'अंश' }, 
+                    denominator: { en: 'Denominator', or: 'ହର', hi: 'हर' } 
                 },
-                escapeRoom: {
-                    instruction: { en: 'Find the key! Which of these is a factor of', or: 'ଚାବି ଖୋଜ! ଏମାନଙ୍କ ମଧ୍ୟରୁ କେଉଁଟି ଏହାର ଗୁଣନୀୟକ', hi: 'चाबी ढूंढो! इनमें से कौन इसका गुणनखंड है' }
+                dataDetective: { 
+                    instruction: { en: 'Be a Data Detective! Find the Median of this dataset.', or: 'ଏକ ଡାଟା ଡିଟେକ୍ଟିଭ୍ ହୁଅନ୍ତୁ! ଏହି ଡାଟାସେଟର ମଧ୍ୟମା ଖୋଜନ୍ତୁ।', hi: 'एक डेटा जासूस बनें! इस डेटासेट का माध्यिका ज्ञात कीजिए।' },
+                    placeholder: { en: 'Median?', or: 'ମଧ୍ୟମା?', hi: 'माध्यिका?' }
                 },
-                shapeMagic: {
-                    instruction: { en: 'What am I?', or: 'ମୁଁ କିଏ?', hi: 'मैं क्या हूँ?' },
-                    questions: [
-                        { q: { en: 'I have no size, only a position.', or: 'ମୋର ଆକାର ନାହିଁ, କେବଳ ଏକ ସ୍ଥିତି ଅଛି |', hi: 'मेरा कोई आकार नहीं है, केवल एक स्थिति है।' }, o: [{ en: 'Line', or: 'ରେଖା', hi: 'रेखा' }, { en: 'Point', or: 'ବିନ୍ଦୁ', hi: 'बिंदु' }, { en: 'Ray', or: 'ରଶ୍ମି', hi: 'किरण' }], a: 1 },
-                        { q: { en: 'I have two endpoints and a fixed length.', or: 'ମୋର ଦୁଇଟି ପ୍ରାନ୍ତବିନ୍ଦୁ ଏବଂ ଏକ ନିର୍ଦ୍ଦିଷ୍ଟ ଦୈର୍ଘ୍ୟ ଅଛି |', hi: 'मेरे दो अंत बिंदु और एक निश्चित लंबाई है।' }, o: [{ en: 'Line Segment', or: 'ରେଖାଖଣ୍ଡ', hi: 'रेखा खंड' }, { en: 'Line', or: 'ରେଖା', hi: 'रेखा' }, { en: 'Angle', or: 'କୋଣ', hi: 'कोण' }], a: 0 },
-                        { q: { en: 'We are lines in the same plane that never meet.', or: 'ଆମେ ଗୋଟିଏ ସମତଳରେ ଥିବା ରେଖା ଯାହା କେବେବି ସାକ୍ଷାତ କରେ ନାହିଁ |', hi: 'हम एक ही तल में रेखाएँ हैं जो कभी नहीं मिलतीं।' }, o: [{ en: 'Intersecting Lines', or: 'ଛେଦି ରେଖା', hi: 'प्रतिच्छेदी रेखाएँ' }, { en: 'Rays', or: 'ରଶ୍ମି', hi: 'किरणें' }, { en: 'Parallel Lines', or: 'ସମାନ୍ତର ରେଖା', hi: 'समानांतर रेखाएँ' }], a: 2 }
-                    ]
+                distanceDash: { 
+                    instruction: { en: 'Calculate the distance between the two points.', or: 'ଦୁଇଟି ବିନ୍ଦୁ ମଧ୍ୟରେ ଦୂରତା ଗଣନା କରନ୍ତୁ।', hi: 'दो बिंदुओं के बीच की दूरी की गणना करें।' },
+                    pointA: { en: 'Point A:', or: 'ବିନ୍ଦୁ A:', hi: 'बिंदु A:' },
+                    pointB: { en: 'Point B:', or: 'ବିନ୍ଦୁ B:', hi: 'बिंदु B:' },
+                    placeholder: { en: 'Distance?', or: 'ଦୂରତା?', hi: 'दूरी?' }
                 },
-                timeTraveler: {
-                    instruction: { en: "Enter the year you'll land in!", or: "ତୁମେ କେଉଁ ବର୍ଷରେ ପହଞ୍ଚିବ ଲେଖ!", hi: "आप किस वर्ष में उतरेंगे, दर्ज करें!" },
-                    mission: { en: 'Mission:', or: 'ମିଶନ୍:', hi: 'मिशन:' },
-                    start: { en: 'You are in the year', or: 'ତୁମେ ବର୍ତ୍ତମାନ ଅଛ', hi: 'आप वर्ष में हैं' },
-                    travel: { en: 'Travel', or: 'ଯାତ୍ରା କର', hi: 'यात्रा करें' },
-                    yearsFuture: { en: 'years into the future!', or: 'ବର୍ଷ ଭବିଷ୍ୟତକୁ!', hi: 'वर्ष भविष्य में!' },
-                    yearsPast: { en: 'years into the past!', or: 'ବର୍ଷ ଅତୀତକୁ!', hi: 'वर्ष अतीत में!' }
+                safeStopChallenge: { 
+                    instruction: { en: 'A car is moving at the speed shown. Calculate the total stopping distance in meters. (Round to nearest whole number)', or: 'ଏକ କାର୍ ଦେଖାଯାଇଥିବା ଗତିରେ ଯାଉଛି। ମିଟରରେ ମୋଟ ଅଟକିବା ଦୂରତା ଗଣନା କରନ୍ତୁ। (ନିକଟତମ ପୂର୍ଣ୍ଣ ସଂଖ୍ୟାକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'एक कार दिखाई गई गति से चल रही है। मीटर में कुल रुकने की दूरी की गणना करें। (निकटतम पूर्ण संख्या तक पूर्णांकित करें)' },
+                    kmh: { en: 'km/h', or: 'କିମି/ଘଣ୍ଟା', hi: 'किमी/घंटा' },
+                    placeholder: { en: 'Distance (m)?', or: 'ଦୂରତା (m)?', hi: 'दूरी (m)?' }
                 },
-                pizzaParty: {
-                    instruction: { en: 'Click on the slices to make the fraction', or: 'ଭଗ୍ନସଂଖ୍ୟା ତିଆରି କରିବା ପାଇଁ ସ୍ଲାଇସ୍ ଉପରେ କ୍ଲିକ୍ କରନ୍ତୁ', hi: 'भिन्न बनाने के लिए स्लाइस पर क्लिक करें' },
+                scaleFactorSurveyor: { 
+                    instruction: { en: 'Help the surveyor find the length of side X using similar triangles.', or: 'ସର୍ବେକ୍ଷକଙ୍କୁ ସମାନ ତ୍ରିଭୁଜ ବ୍ୟବହାର କରି X ପାର୍ଶ୍ଵର ଦୈର୍ଘ୍ୟ ଖୋଜିବାରେ ସାହାଯ୍ୟ କରନ୍ତୁ।', hi: 'समरूप त्रिभुजों का उपयोग करके भुजा X की लंबाई ज्ञात करने में सर्वेक्षक की सहायता करें।' },
+                    placeholder: { en: 'Length of X?', or: 'X ର ଦୈର୍ଘ୍ୟ?', hi: 'X की लंबाई?' }
                 },
-                decimalDash: {
-                    instruction: { en: 'Which is the correct decimal for', or: 'ଏଥିପାଇଁ ସଠିକ୍ ଦଶମିକ କେଉଁଟି?', hi: 'इसके लिए सही दशमलव कौन सा है?' },
+                arcAngleArcher: { 
+                    instruction: { en: 'An archer hits a target. Given the radius and arc length, find the central angle θ. (Use π ≈ 3.14 and round to nearest degree)', or: 'ଜଣେ ଧନୁର୍ଦ୍ଧର ଏକ ଲକ୍ଷ୍ୟକୁ ମାରନ୍ତି। ବ୍ୟାସାର୍ଦ୍ଧ ଏବଂ ଚାପ ଦୈର୍ଘ୍ୟ ଦିଆଯାଇ, କେନ୍ଦ୍ରୀୟ କୋଣ θ ଖୋଜନ୍ତୁ। (π ≈ 3.14 ବ୍ୟବହାର କରନ୍ତୁ ଏବଂ ନିକଟତମ ଡିଗ୍ରୀକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'एक तीरंदाज एक लक्ष्य को भेदता है। त्रिज्या और चाप की लंबाई को देखते हुए, केंद्रीय कोण θ ज्ञात कीजिए। (π ≈ 3.14 का उपयोग करें और निकटतम डिग्री तक पूर्णांकित करें)' },
+                    placeholder: { en: 'Angle θ?', or: 'କୋଣ θ?', hi: 'कोण θ?' }
                 },
-                marketMayhem: {
-                    instruction: { en: 'You have ₹100. Can you buy these items?', or: 'ତୁମ ପାଖରେ ₹100 ଅଛି। ତୁମେ ଏହି ଜିନିଷଗୁଡ଼ିକ କିଣି ପାରିବ କି?', hi: 'आपके पास ₹100 हैं। क्या आप ये वस्तुएँ खरीद सकते हैं?' },
-                    calculate: { en: 'Calculate Total', or: 'ମୋଟ ହିସାବ କରନ୍ତୁ', hi: 'कुल की गणना करें' },
-                    yes: { en: 'Yes!', or: 'ହଁ!', hi: 'हाँ!' },
-                    no: { en: 'No!', or: 'ନା!', hi: 'नहीं!' },
-                    total: { en: 'Total:', or: 'ମୋଟ:', hi: 'कुल:' }
+                tangentTracer: { 
+                    instruction: { en: 'Find the length of the tangent (t) from the point to the circle.', or: 'ବିନ୍ଦୁରୁ ବୃତ୍ତ ପର୍ଯ୍ୟନ୍ତ ସ୍ପର୍ଶକ (t)ର ଦୈର୍ଘ୍ୟ ଖୋଜନ୍ତୁ।', hi: 'बिंदु से वृत्त तक स्पर्श रेखा (t) की लंबाई ज्ञात कीजिए।' },
+                    placeholder: { en: 'Length of t?', or: 't ର ଦୈର୍ଘ୍ୟ?', hi: 't की लंबाई?' }
                 },
-                mountainClimber: {
-                    instruction: { en: 'Calculate your new altitude!', or: 'ତୁମର ନୂଆ ଉଚ୍ଚତା ଗଣନା କରନ୍ତୁ!', hi: 'अपनी नई ऊंचाई की गणना करें!' },
-                    start: { en: 'You are at', or: 'ତୁମେ ଅଛ', hi: 'आप पर हैं' },
-                    change: { en: 'A gust of wind moves you', or: 'ଏକ ପବନ ତୁମକୁ ନେଇଯାଏ', hi: 'हवा का एक झोंका आपको ले जाता है' },
-                    up: { en: 'm up.', or: 'ମିଟର ଉପରକୁ।', hi: 'मीटर ऊपर।' },
-                    down: { en: 'm down.', or: 'ମିଟର ତଳକୁ।', hi: 'मीटर नीचे।' },
-                    question: { en: 'What is your new position?', or: 'ତୁମର ନୂଆ ସ୍ଥିତି କ’ଣ?', hi: 'आपकी नई स्थिति क्या है?' }
+                trigTower: { 
+                    instruction: { en: 'Find the height (h) of the tower. (Round to the nearest whole number)', or: 'ଟାୱାରର ଉଚ୍ଚତା (h) ଖୋଜନ୍ତୁ। (ନିକଟତମ ପୂର୍ଣ୍ଣ ସଂଖ୍ୟାକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'टॉवर की ऊँचाई (h) ज्ञात कीजिए। (निकटतम पूर्ण संख्या तक पूर्णांकित करें)' },
+                    placeholder: { en: 'Height (h)?', or: 'ଉଚ୍ଚତା (h)?', hi: 'ऊँचाई (h)?' }
                 },
-                polygonPuzzle: {
-                    instruction: { en: 'Answer the question about the shape!', or: 'ଆକୃତି ବିଷୟରେ ପ୍ରଶ୍ନର ଉତ୍ତର ଦିଅନ୍ତୁ!', hi: 'आकृति के बारे में प्रश्न का उत्तर दें!' },
-                    questions: [
-                          { q: { en: 'Which of these is a simple closed curve?', or: 'ଏମାନଙ୍କ ମଧ୍ୟରୁ କେଉଁଟି ଏକ ସରଳ ବନ୍ଦ ବକ୍ରରେଖା?', hi: 'इनमें से कौन सा एक साधारण बंद वक्र है?' }, o: [{ en: 'A smiling face', or: 'ଏକ ହସୁଥିବା ଚେହେରା', hi: 'एक मुस्कुराता हुआ चेहरा' }, { en: 'A figure eight', or: 'ଏକ ଆଠ ଆକୃତି', hi: 'एक आठ का आंकड़ा' }, { en: 'A triangle', or: 'ଏକ ତ୍ରିଭୁଜ', hi: 'एक त्रिभुज' }], a: 2 },
-                          { q: { en: 'How many sides does a quadrilateral have?', or: 'ଏକ ଚତୁର୍ଭୁଜର କେତୋଟି ପାର୍ଶ୍ଵ ଅଛି?', hi: 'एक चतुर्भुज की कितनी भुजाएँ होती हैं?' }, o: [{ en: '3', or: '୩', hi: '३' }, { en: '4', or: '୪', hi: '४' }, { en: '5', or: '୫', hi: '५' }], a: 1 },
-                          { q: { en: 'What do you call a polygon with 5 sides?', or: '୫ଟି ପାର୍ଶ୍ଵ ଥିବା ବହୁଭୁଜକୁ କ’ଣ କୁହାଯାଏ?', hi: '५ भुजाओं वाले बहुभुज को क्या कहते हैं?' }, o: [{ en: 'Hexagon', or: 'ଷଡ଼ଭୁଜ', hi: 'षट्कोण' }, { en: 'Pentagon', or: 'ପଞ୍ଚଭୁଜ', hi: 'पंचकोण' }, { en: 'Octagon', or: 'ଅଷ୍ଟଭୁଜ', hi: 'अष्टकोण' }], a: 1 }
-                    ]
+                volumeVoyage: { 
+                    instruction: { en: 'Find the volume of the cylinder. (Use π ≈ 3.14 and round to the nearest whole number)', or: 'ସିଲିଣ୍ଡରର ଆୟତନ ଖୋଜନ୍ତୁ। (π ≈ 3.14 ବ୍ୟବହାର କରନ୍ତୁ ଏବଂ ନିକଟତମ ପୂର୍ଣ୍ଣ ସଂଖ୍ୟାକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'सिलेंडर का आयतन ज्ञात कीजिए। (π ≈ 3.14 का उपयोग करें और निकटतम पूर्ण संख्या तक पूर्णांकित करें)' },
+                    placeholder: { en: 'Volume?', or: 'ଆୟତନ?', hi: 'आयतन?' }
                 },
-                variableVoyager: {
-                    instruction: { en: 'Find the value of X to guide the rocket!', or: 'ରକେଟକୁ ମାର୍ଗଦର୍ଶନ କରିବା ପାଇଁ Xର ମୂଲ୍ୟ ଖୋଜନ୍ତୁ!', hi: 'रॉकेट का मार्गदर्शन करने के लिए X का मान ज्ञात करें!' },
-                    solve: { en: 'Solve:', or: 'ସମାଧାନ କରନ୍ତୁ:', hi: 'हल करें:' },
-                },
-                gardenArchitect: {
-                    instruction: { en: 'Calculate what the architect needs!', or: 'ସ୍ଥପତିଙ୍କୁ କ’ଣ ଦରକାର ତାହା ଗଣନା କରନ୍ତୁ!', hi: 'वास्तुकार को क्या चाहिए, उसकी गणना करें!' },
-                    question_perimeter: { en: 'How much fencing is needed for this garden (Perimeter)?', or: 'ଏହି ବଗିଚା ପାଇଁ କେତେ ବାଡ଼ ଦରକାର (ପରିସୀମା)?', hi: 'इस बगीचे के लिए कितनी बाड़ की आवश्यकता है (परिधि)?' },
-                    question_area: { en: 'How much space is there for seeds (Area)?', or: 'ବୀଜ ପାଇଁ କେତେ ଜାଗା ଅଛି (କ୍ଷେତ୍ରଫଳ)?', hi: 'बीज के लिए कितनी जगह है (क्षेत्रफल)?' },
-                    unit: { en: 'm', or: 'ମି', hi: 'मी' },
-                    unit_sq: { en: 'sq. m', or: 'ବର୍ଗ ମି', hi: 'वर्ग मी' }
-                },
-                fruitStandFrenzy: {
-                    instruction: { en: 'Answer the questions based on the fruit sales chart!', or: 'ଫଳ ବିକ୍ରି ଚାର୍ଟ ଉପରେ ଆଧାର କରି ପ୍ରଶ୍ନଗୁଡ଼ିକର ଉତ୍ତର ଦିଅନ୍ତୁ!', hi: 'फलों की बिक्री चार्ट के आधार पर प्रश्नों के उत्तर दें!' },
-                    questions: [
-                        { q: { en: 'Which fruit was sold the most?', or: 'କେଉଁ ଫଳ ସବୁଠାରୁ ଅଧିକ ବିକ୍ରି ହୋଇଥିଲା?', hi: 'कौन सा फल सबसे ज्यादा बिका?' }, o: [{ en: 'Apples', or: 'ସେଓ', hi: 'सेब' }, { en: 'Bananas', or: 'କଦଳୀ', hi: 'केले' }, { en: 'Oranges', or: 'କମଳା', hi: 'संतरे' }], a: 1 },
-                        { q: { en: 'How many fruits were sold in total?', or: 'ମୋଟ କେତୋଟି ଫଳ ବିକ୍ରି ହୋଇଥିଲା?', hi: 'कुल कितने फल बिके?' }, o: [20, 25, 30], a: 2 }
-                    ]
-                },
-                blueprintBuilder: {
-                    instruction: { en: 'To perform this construction, which tool is essential?', or: 'ଏହି ନିର୍ମାଣ କରିବା ପାଇଁ, କେଉଁ ଉପକରଣଟି ଅତ୍ୟାବଶ୍ୟକ?', hi: 'इस निर्माण को करने के लिए, कौन सा उपकरण आवश्यक है?' },
-                    questions: [
-                        { q: { en: 'Constructing a circle of radius 5cm', or: '5 ସେମି ବ୍ୟାସାର୍ଦ୍ଧର ଏକ ବୃତ୍ତ ନିର୍ମାଣ', hi: '5 सेमी त्रिज्या का एक वृत्त बनाना' }, o: [{ en: 'Ruler', or: 'ସ୍କେଲ୍', hi: 'रूलर' }, { en: 'Compass', or: 'କମ୍ପାସ୍', hi: 'कम्पास' }, { en: 'Protractor', or: 'ପ୍ରୋଟ୍ରାକ୍ଟର୍', hi: 'प्रोटेक्टर' }], a: 1 },
-                        { q: { en: 'Drawing a line segment of length 7cm', or: '7 ସେମି ଦୈର୍ଘ୍ୟର ଏକ ରେଖାଖଣ୍ଡ ଅଙ୍କନ', hi: '7 सेमी लंबाई का एक रेखा खंड खींचना' }, o: [{ en: 'Ruler', or: 'ସ୍କେଲ୍', hi: 'रूलर' }, { en: 'Compass', or: 'କମ୍ପାସ୍', hi: 'कम्पास' }, { en: 'Set-square', or: 'ସେଟ୍-ସ୍କୋୟାର', hi: 'सेट-स्क्वायर' }], a: 0 }
-                    ]
-                }
+                constructionCrew: { instruction: { en: 'You are bisecting an angle. What is the correct next step?', or: 'ଆପଣ ଏକ କୋଣକୁ ଦ୍ୱିଖଣ୍ଡିତ କରୁଛନ୍ତି। ପରବର୍ତ୍ତୀ ସଠିକ୍ ପଦକ୍ଷେପ କ’ଣ?', hi: 'आप एक कोण का समद्विभाजन कर रहे हैं। अगला सही कदम क्या है?' } }
             };
 
-            // --- UI ELEMENTS ---
-            const startScreen = document.getElementById('start-screen');
-            const playNowBtn = document.getElementById('play-now-btn');
-            const appContainer = document.getElementById('app-container');
             const mainContent = document.getElementById('main-content');
-            const platformTitle = document.getElementById('platform-title');
-            const langEnBtn = document.getElementById('lang-en-btn');
-            const langOrBtn = document.getElementById('lang-or-btn');
-            const langHiBtn = document.getElementById('lang-hi-btn');
             const gameModal = document.getElementById('game-modal');
             const gameTitle = document.getElementById('game-title');
             const gameContent = document.getElementById('game-content');
-            const closeModalBtn = document.getElementById('close-modal-btn');
+            let activeGame = null;
 
-            // --- RENDER FUNCTIONS ---
-            
             function renderChapters() {
                 mainContent.innerHTML = `
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8 overflow-y-auto h-[calc(100vh-120px)] pb-12 pr-4">
-                        ${textContent.chapters.map(chapter => `
-                            <div id="${chapter.id}" class="chapter-card">
-                                <div class="text-white p-4 rounded-lg ${chapter.color}">
-                                    <h2 class="text-2xl font-bold mb-2 chapter-title lang-${currentLanguage}">${chapter.title[currentLanguage]}</h2>
+                        ${textContent.chapters.map(chapter => {
+                            const unit = chapter.units[0];
+                            return `
+                            <div data-game="${unit.game}" data-chapter-id="${chapter.id}" class="chapter-card ${chapter.color}">
+                                <div class="text-white">
+                                    <h2 class="text-xl lg:text-2xl font-bold mb-2 chapter-title lang-${currentLanguage}">${chapter.title[currentLanguage]}</h2>
                                 </div>
                             </div>
-                        `).join('')}
+                            `}).join('')}
                     </div>
                 `;
             }
 
-            function renderUnits(chapterId) {
-                const chapter = textContent.chapters.find(c => c.id === chapterId);
-                mainContent.innerHTML = `
-                    <div class="flex items-center mb-6">
-                        <button id="back-to-chapters" class="mr-4 p-2 rounded-full bg-white/50 hover:bg-white/80 transition-colors">
-                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <h2 class="text-3xl font-bold text-white text-shadow lang-${currentLanguage}">${chapter.title[currentLanguage]}</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${chapter.units.map(unit => `
-                            <button data-game="${unit.game || 'none'}" data-unit-id="${unit.id}" class="unit-button w-full text-left p-4 rounded-xl shadow-md text-white font-semibold ${chapter.color} ${unit.game && unit.game !== 'comingSoon' ? '' : 'opacity-50 cursor-not-allowed'} hover:scale-105 transition-transform">
-                                <span class="lang-${currentLanguage}">${unit.title[currentLanguage]}</span>
-                            </button>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            // --- GAME IMPLEMENTATIONS ---
-            const games = {
-                detectiveMath: {
-                    init() {
-                        const sequence = [2, 4, '?', 8, 10];
-                        gameTitle.textContent = textContent.chapters[0].units[0].title[currentLanguage];
+             const games = {
+                equationBalancer: {
+                    currentQuestion: null,
+                    generateData() { const x = Math.floor(Math.random() * 8) + 1; const y = Math.floor(Math.random() * 8) + 1; const a = 2; const b = 1; this.currentQuestion = { eq1: `${a}x + ${b}y = ${a * x + b * y}`, eq2: `x + y = ${x + y}`, solution: { x, y } }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { solution } = this.currentQuestion; return { en: `Use substitution. From <b>y = ${solution.x + solution.y} - x</b>, substitute into the first equation: <b>2x + (${solution.x + solution.y} - x) = ${2*solution.x + solution.y}</b>. This gives <b>x = ${solution.x}</b>. Then find y.`, or: `ପ୍ରତିସ୍ଥାପନ ବ୍ୟବହାର କରନ୍ତୁ। <b>y = ${solution.x + solution.y} - x</b> ରୁ, ପ୍ରଥମ ସମୀକରଣରେ ପ୍ରତିସ୍ଥାପନ କରନ୍ତୁ: <b>2x + (${solution.x + solution.y} - x) = ${2*solution.x + solution.y}</b>। ଏହା <b>x = ${solution.x}</b> ଦିଏ। ତା'ପରେ y ଖୋଜନ୍ତୁ।`, hi: `प्रतिस्थापन का प्रयोग करें। <b>y = ${solution.x + solution.y} - x</b> से, पहले समीकरण में प्रतिस्थापित करें: <b>2x + (${solution.x + solution.y} - x) = ${2*solution.x + solution.y}</b>। इससे <b>x = ${solution.x}</b> मिलता है। फिर y ज्ञात करें।`, answer: `x=${solution.x}, y=${solution.y}` }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
                         gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.detectiveMath.instruction[currentLanguage]}</p>
-                            <div class="clue-box my-6">
-                                <p class="text-sm text-gray-500 lang-${currentLanguage}">${gameData.detectiveMath.caseFile[currentLanguage]}</p>
-                                <div class="text-center text-4xl font-bold tracking-wider my-4">${sequence.join(' &nbsp; ')}</div>
+                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.equationBalancer.instruction[currentLanguage]}</p>
+                            <div class="space-y-4 my-6">
+                               <div class="equation-box p-4 rounded-lg text-2xl text-center">${question.eq1}</div>
+                               <div class="equation-box p-4 rounded-lg text-2xl text-center">${question.eq2}</div>
                             </div>
                             <div class="flex justify-center items-center gap-4">
-                                <input id="game-answer" type="number" class="p-2 text-2xl text-center w-24 border-2 rounded-lg" />
+                                <span class="text-xl font-bold">${gameData.equationBalancer.xEquals[currentLanguage]}</span><input id="x-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" />
+                                <span class="text-xl font-bold">${gameData.equationBalancer.yEquals[currentLanguage]}</span><input id="y-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" />
                                 <button id="check-btn" class="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
                             </div>
                             <div id="feedback-container" class="text-center mt-6"></div>
                         `;
-
                         document.getElementById('check-btn').addEventListener('click', () => {
-                            const answer = document.getElementById('game-answer').value;
-                            showFeedback(parseInt(answer) === 6, () => this.init());
+                            const x = document.getElementById('x-answer').value;
+                            const y = document.getElementById('y-answer').value;
+                            showFeedback(parseInt(x) === this.currentQuestion.solution.x && parseInt(y) === this.currentQuestion.solution.y, () => this.init(chapterId));
                         });
                     }
                 },
-                treasureHunt: {
-                    init() {
-                        const numberStr = "4,81,716";
-                        const quests = [
-                            { place: 'lakhs', answer: 4 },
-                            { place: 'tenThousands', answer: 8 },
-                            { place: 'thousands', answer: 1 },
-                            { place: 'hundreds', answer: 7 },
-                            { place: 'tens', answer: 1 },
-                            { place: 'ones', answer: 6 }
-                        ];
-                        const currentQuest = quests[Math.floor(Math.random() * quests.length)];
-
-                        let options = new Set([currentQuest.answer]);
-                        while (options.size < 3) {
-                            options.add(Math.floor(Math.random() * 10));
+                quadraticCatapult: {
+                    currentQuestion: null,
+                    generateData() { const r1 = Math.floor(Math.random() * 4) + 1; const r2 = Math.floor(Math.random() * 5) + 5; this.currentQuestion = { equation: `x² - ${r1 + r2}x + ${r1 * r2} = 0`, roots: [r1, r2], sum: r1 + r2, product: r1 * r2, }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { sum, product, roots } = this.currentQuestion; return { en: `Factor the equation. Find two numbers that add to <b>${sum}</b> and multiply to <b>${product}</b>. The numbers are ${roots[0]} and ${roots[1]}. So, <b>(x - ${roots[0]})(x - ${roots[1]}) = 0</b>.`, or: `ସମୀକରଣକୁ ଫ୍ୟାକ୍ଟର୍ କରନ୍ତୁ। ଦୁଇଟି ସଂଖ୍ୟା ଖୋଜନ୍ତୁ ଯାହାର ଯୋଗଫଳ <b>${sum}</b> ଏବଂ ଗୁଣଫଳ <b>${product}</b>। ସଂଖ୍ୟାଗୁଡ଼ିକ ହେଉଛି ${roots[0]} ଏବଂ ${roots[1]}। ତେଣୁ, <b>(x - ${roots[0]})(x - ${roots[1]}) = 0</b>।`, hi: `समीकरण का गुणनखंड करें। ऐसी दो संख्याएँ ज्ञात करें जिनका योग <b>${sum}</b> हो और गुणनफल <b>${product}</b> हो। संख्याएँ ${roots[0]} और ${roots[1]} हैं। तो, <b>(x - ${roots[0]})(x - ${roots[1]}) = 0</b>।`, answer: `${roots[0]} or ${roots[1]}` }; },
+                    animateProjectile(hitRoot) { const canvas = document.getElementById('catapult-canvas'); if (!canvas) return; const ctx = canvas.getContext('2d'); const w = canvas.width, h = canvas.height; ctx.clearRect(0, 0, w, h); const startX = 20, startY = h - 20; const targetX = (hitRoot / 10) * w; const controlY = -h/2; let progress = 0; const animation = () => { progress += 0.02; if (progress > 1) { showFeedback(true, () => this.init(gameTitle.dataset.chapterId), gameData.hit[currentLanguage]); return; } const x = startX + (targetX - startX) * progress; const y = startY + 4 * (startY - controlY) * (progress - progress * progress); ctx.clearRect(0, 0, w, h); ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.fillStyle = '#34495e'; ctx.fill(); requestAnimationFrame(animation); }; animation(); },
+                    init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `
+                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.quadraticCatapult.instruction[currentLanguage]}</p>
+                             <div class="equation-box p-4 rounded-lg text-2xl text-center font-bold my-4">${question.equation}</div>
+                            <div class="catapult-game p-4">
+                                <canvas id="catapult-canvas" width="600" height="300"></canvas>
+                                <div class="target" style="left: ${question.roots[0] * 10}%;">🎯</div>
+                                <div class="target" style="left: ${question.roots[1] * 10}%;">🎯</div>
+                            </div>
+                             <div class="flex justify-center items-center gap-4 mt-4">
+                                <span class="text-xl font-bold">${gameData.quadraticCatapult.rootLabel[currentLanguage]}</span><input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" />
+                                <button id="check-btn" class="px-6 py-3 bg-green-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.quadraticCatapult.launch[currentLanguage]}</button>
+                            </div>
+                            <div id="feedback-container" class="text-center mt-6"></div>
+                        `;
+                        const gameArea = gameContent.querySelector('.catapult-game'); const canvas = document.getElementById('catapult-canvas'); if (gameArea && canvas) { canvas.width = gameArea.clientWidth; canvas.height = gameArea.clientHeight; }
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = parseInt(document.getElementById('game-answer').value); if (this.currentQuestion.roots.includes(ans)) { document.getElementById('check-btn').disabled = true; this.animateProjectile(ans); } else { showFeedback(false, () => this.init(chapterId)); } });
+                    }
+                },
+                progressionPath: {
+                    currentQuestion: null,
+                    generateData() { const start = Math.floor(Math.random() * 10) + 1; const diff = Math.floor(Math.random() * 5) + 2; this.currentQuestion = { terms: [start, start + diff, start + diff * 2], answer: start + diff * 3, diff: diff, }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { terms, diff, answer } = this.currentQuestion; return { en: `Find the common difference: <b>${terms[1]} - ${terms[0]} = ${diff}</b>. Add it to the last term: <b>${terms[2]} + ${diff} = ${answer}</b>.`, or: `ସାଧାରଣ ଅନ୍ତର ଖୋଜନ୍ତୁ: <b>${terms[1]} - ${terms[0]} = ${diff}</b>। ଏହାକୁ ଶେଷ ପଦରେ ଯୋଗ କରନ୍ତୁ: <b>${terms[2]} + ${diff} = ${answer}</b>।`, hi: `सार्व अंतर ज्ञात कीजिए: <b>${terms[1]} - ${terms[0]} = ${diff}</b>। इसे अंतिम पद में जोड़ें: <b>${terms[2]} + ${diff} = ${answer}</b>।`, answer: answer }; },
+                   init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `
+                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.progressionPath.instruction[currentLanguage]}</p>
+                            <div class="flex justify-center items-center gap-4 text-3xl font-bold my-8">
+                                <span>🐸</span>
+                                ${question.terms.map(t => `<span class="p-4 bg-green-200 rounded-full">${t}</span>`).join('')}
+                                <span class="p-4 bg-gray-300 rounded-full">?</span>
+                                <span>🏁</span>
+                            </div>
+                             <div class="flex justify-center items-center gap-4 mt-4">
+                                <input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" />
+                                <button id="check-btn" class="px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
+                            </div>
+                            <div id="feedback-container" class="text-center mt-6"></div>
+                        `;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                probabilitySpinner: {
+                    currentQuestion: null,
+                    gcd(a, b) { return b === 0 ? a : this.gcd(b, a % b); },
+                    generateData() { const slices = [ { color: '#3498db', name: 'Blue', count: Math.ceil(Math.random() * 4) }, { color: '#e74c3c', name: 'Red', count: Math.ceil(Math.random() * 4) }, { color: '#2ecc71', name: 'Green', count: Math.ceil(Math.random() * 4) } ]; const total = slices.reduce((sum, s) => sum + s.count, 0); const target = slices[1]; const commonDivisor = this.gcd(target.count, total); this.currentQuestion = { slices, total, targetCount: target.count, answer: { num: target.count / commonDivisor, den: total / commonDivisor } }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { total, targetCount, answer } = this.currentQuestion; return { en: `Probability is (Favorable Outcomes) / (Total Outcomes). There are <b>${targetCount}</b> red slices and <b>${total}</b> total slices. The probability is <b>${targetCount}/${total}</b>, which simplifies to <b>${answer.num}/${answer.den}</b>.`, or: `ସମ୍ଭାବ୍ୟତା ହେଉଛି (ଅନୁକୂଳ ଫଳାଫଳ) / (ମୋଟ ଫଳାଫଳ)। ଏଠାରେ <b>${targetCount}</b>ଟି ଲାଲ୍ ସ୍ଲାଇସ୍ ଏବଂ <b>${total}</b>ଟି ମୋଟ ସ୍ଲାଇସ୍ ଅଛି। ସମ୍ଭାବ୍ୟତା <b>${targetCount}/${total}</b>, ଯାହା ସରଳୀକୃତ ହୋଇ <b>${answer.num}/${answer.den}</b> ହୁଏ।`, hi: `प्रायिकता है (अनुकूल परिणाम) / (कुल परिणाम)। यहाँ <b>${targetCount}</b> लाल स्लाइस और <b>${total}</b> कुल स्लाइस हैं। प्रायिकता <b>${targetCount}/${total}</b> है, जिसे सरल करने पर <b>${answer.num}/${answer.den}</b> होता है।`, answer: `${answer.num} / ${answer.den}` }; },
+                    drawSpinner(data) { let cumulativePercent = 0; const parts = data.slices.map(slice => { const percent = (slice.count / data.total) * 100; const val = `${slice.color} ${cumulativePercent}% ${cumulativePercent + percent}%`; cumulativePercent += percent; return val; }); return `<div class="w-64 h-64 mx-auto my-6 rounded-full" style="background: conic-gradient(${parts.join(', ')});"></div>`; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.probabilitySpinner.instruction[currentLanguage]}</p>${this.drawSpinner(question)}<div class="flex justify-center items-center gap-4"><span class="text-xl font-bold">${gameData.probabilitySpinner.numerator[currentLanguage]}:</span><input id="num-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" /><span class="text-xl font-bold">${gameData.probabilitySpinner.denominator[currentLanguage]}:</span><input id="den-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" /></div><div class="flex justify-center mt-4"><button id="check-btn" class="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                        document.getElementById('check-btn').addEventListener('click', () => { const num = document.getElementById('num-answer').value; const den = document.getElementById('den-answer').value; showFeedback(parseInt(num) === this.currentQuestion.answer.num && parseInt(den) === this.currentQuestion.answer.den, () => this.init(chapterId)); });
+                    }
+                },
+                dataDetective: {
+                    currentQuestion: null,
+                    generateData() { const data = Array.from({length: 5}, () => Math.floor(Math.random() * 30) + 1); const sorted = [...data].sort((a,b) => a - b); this.currentQuestion = { data, sortedData: sorted, answer: sorted[2] }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { data, sortedData, answer } = this.currentQuestion; return { en: `First, sort the numbers: <b>${data.join(', ')}</b> becomes <b>${sortedData.join(', ')}</b>. The median is the middle number.`, or: `ପ୍ରଥମେ, ସଂଖ୍ୟାଗୁଡ଼ିକୁ ସଜାନ୍ତୁ: <b>${data.join(', ')}</b> ହୋଇଯାଏ <b>${sortedData.join(', ')}</b>। ମଧ୍ୟମା ହେଉଛି ମଝି ସଂଖ୍ୟା।`, hi: `पहले, संख्याओं को क्रमबद्ध करें: <b>${data.join(', ')}</b> बन जाता है <b>${sortedData.join(', ')}</b>। माध्यिका बीच की संख्या है।`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.dataDetective.instruction[currentLanguage]}</p><div class="flex justify-center items-center gap-4 text-3xl font-bold my-8 bg-pink-100 p-4 rounded-lg">${question.data.map(d => `<span>${d}</span>`).join('<span class="text-pink-300">,</span>')}</div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" placeholder="${gameData.dataDetective.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-pink-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                distanceDash: {
+                    currentQuestion: null,
+                    generateData() { const triples = [[3,4,5], [6,8,10], [5,12,13]]; const t = triples[Math.floor(Math.random() * triples.length)]; const p1 = { x: Math.floor(Math.random() * 5), y: Math.floor(Math.random() * 5) }; const p2 = { x: p1.x + t[0], y: p1.y + t[1] }; this.currentQuestion = { p1, p2, answer: t[2] }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { p1, p2, answer } = this.currentQuestion; return { en: `Use the distance formula: <b>d = √((x₂-x₁)² + (y₂-y₁)²)</b>. This gives d = √((<b>${p2.x}</b>-<b>${p1.x}</b>)² + (<b>${p2.y}</b>-<b>${p1.y}</b>)²) = √<b>${answer**2}</b>.`, or: `ଦୂରତା ସୂତ୍ର ବ୍ୟବହାର କରନ୍ତୁ: <b>d = √((x₂-x₁)² + (y₂-y₁)²)</b>। ଏହା ଦିଏ d = √((<b>${p2.x}</b>-<b>${p1.x}</b>)² + (<b>${p2.y}</b>-<b>${p1.y}</b>)²) = √<b>${answer**2}</b>।`, hi: `दूरी सूत्र का प्रयोग करें: <b>d = √((x₂-x₁)² + (y₂-y₁)²)</b>। इससे d = √((<b>${p2.x}</b>-<b>${p1.x}</b>)² + (<b>${p2.y}</b>-<b>${p1.y}</b>)²) = √<b>${answer**2}</b> मिलता है।`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.distanceDash.instruction[currentLanguage]}</p><div class="text-center text-2xl font-bold my-8 space-y-2"><p>${gameData.distanceDash.pointA[currentLanguage]} <span class="text-indigo-600">(${question.p1.x}, ${question.p1.y})</span></p><p>${gameData.distanceDash.pointB[currentLanguage]} <span class="text-indigo-600">(${question.p2.x}, ${question.p2.y})</span></p></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" placeholder="${gameData.distanceDash.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-indigo-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                safeStopChallenge: {
+                    currentQuestion: null,
+                    generateData() { const speed = (Math.floor(Math.random() * 5) + 4) * 10; const reactionDist = (speed / 10) * 3; const brakingDist = ((speed / 10) ** 2) / 2; const answer = Math.round(reactionDist + brakingDist); this.currentQuestion = { speed, reactionDist, brakingDist, answer }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { reactionDist, brakingDist, answer } = this.currentQuestion; return { en: `Total Stopping Distance = Reaction Distance + Braking Distance. <br>Reaction ≈ (Speed/10)*3 = <b>${reactionDist.toFixed(1)}m</b>. <br>Braking ≈ (Speed/10)²/2 = <b>${brakingDist.toFixed(1)}m</b>. <br>Total ≈ <b>${(reactionDist + brakingDist).toFixed(1)}m</b>.`, or: `ମୋଟ ଅଟକିବା ଦୂରତା = ପ୍ରତିକ୍ରିୟା ଦୂରତା + ବ୍ରେକିଂ ଦୂରତା। <br>ପ୍ରତିକ୍ରିୟା ≈ (ଗତି/10)*3 = <b>${reactionDist.toFixed(1)}m</b>। <br>ବ୍ରେକିଂ ≈ (ଗତି/10)²/2 = <b>${brakingDist.toFixed(1)}m</b>। <br>ମୋଟ ≈ <b>${(reactionDist + brakingDist).toFixed(1)}m</b>।`, hi: `कुल रुकने की दूरी = प्रतिक्रिया दूरी + ब्रेकिंग दूरी। <br>प्रतिक्रिया ≈ (गति/10)*3 = <b>${reactionDist.toFixed(1)}मी</b>। <br>ब्रेकिंग ≈ (गति/10)²/2 = <b>${brakingDist.toFixed(1)}मी</b>। <br>कुल ≈ <b>${(reactionDist + brakingDist).toFixed(1)}मी</b>।`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.safeStopChallenge.instruction[currentLanguage]}</p><div class="my-8 text-center"><span class="text-5xl font-bold text-red-600">${question.speed}</span> <span class="text-2xl">${gameData.safeStopChallenge.kmh[currentLanguage]}</span></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="${gameData.safeStopChallenge.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-red-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                scaleFactorSurveyor: {
+                    currentQuestion: null,
+                    generateData() { const scale = parseFloat((Math.random() * 1.5 + 1.5).toFixed(1)); const base1 = Math.floor(Math.random() * 5) + 4; const height1 = Math.floor(Math.random() * 5) + 3; const base2 = Math.round(base1 * scale); this.currentQuestion = { base1, height1, base2, answer: Math.round(height1 * scale) }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { base1, height1, base2, answer } = this.currentQuestion; return { en: `The ratio of corresponding sides is equal. <br><b>(Height 2 / Height 1) = (Base 2 / Base 1)</b>. <br>So, <b>(X / ${height1}) = (${base2} / ${base1})</b>. <br>This gives <b>X = (${base2} / ${base1}) * ${height1}</b>.`, or: `ଅନୁରୂପ ପାର୍ଶ୍ଵଗୁଡ଼ିକର ଅନୁପାତ ସମାନ। <br><b>(ଉଚ୍ଚତା 2 / ଉଚ୍ଚତା 1) = (ଭୂମି 2 / ଭୂମି 1)</b>। <br>ତେଣୁ, <b>(X / ${height1}) = (${base2} / ${base1})</b>। <br>ଏହା <b>X = (${base2} / ${base1}) * ${height1}</b> ଦିଏ।`, hi: `संगत भुजाओं का अनुपात बराबर होता है। <br><b>(ऊँचाई 2 / ऊँचाई 1) = (आधार 2 / आधार 1)</b>। <br>तो, <b>(X / ${height1}) = (${base2} / ${base1})</b>। <br>इससे <b>X = (${base2} / ${base1}) * ${height1}</b> मिलता है।`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.scaleFactorSurveyor.instruction[currentLanguage]}</p><div class="flex justify-around items-end my-4 h-48"><svg width="120" height="150" viewBox="0 0 120 150"><polygon points="5,145 115,145 5,5" style="fill:none;stroke:orange;stroke-width:3" /><text x="50" y="140" font-size="12" fill="black">${q.base1}</text><text x="15" y="80" font-size="12" transform="rotate(-90 15,80)" fill="black">${q.height1}</text></svg><svg width="180" height="200" viewBox="0 0 180 200"><polygon points="5,195 175,195 5,5" style="fill:none;stroke:orange;stroke-width:3" /><text x="80" y="190" font-size="12" fill="black">${q.base2}</text><text x="15" y="100" font-size="12" transform="rotate(-90 15,100)" fill="black">X</text></svg></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="${gameData.scaleFactorSurveyor.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-orange-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                arcAngleArcher: {
+                    currentQuestion: null,
+                    generateData() { const r = Math.floor(Math.random() * 5) + 5; const theta = [30, 45, 60, 90][Math.floor(Math.random()*4)]; const arcLength = parseFloat(((theta / 360) * 2 * 3.14 * r).toFixed(1)); this.currentQuestion = { r, arcLength, answer: theta }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { r, arcLength, answer } = this.currentQuestion; return { en: `Use the formula: <b>θ = (Arc Length * 360) / (2 * π * r)</b>. <br>Plugging in the values: θ = (<b>${arcLength}</b> * 360) / (2 * 3.14 * <b>${r}</b>).`, or: `ସୂତ୍ର ବ୍ୟବହାର କରନ୍ତୁ: <b>θ = (ଚାପ ଦୈର୍ଘ୍ୟ * 360) / (2 * π * r)</b>। <br>ମୂଲ୍ୟଗୁଡ଼ିକୁ ସ୍ଥାପନ କଲେ: θ = (<b>${arcLength}</b> * 360) / (2 * 3.14 * <b>${r}</b>)।`, hi: `सूत्र का प्रयोग करें: <b>θ = (चाप की लंबाई * 360) / (2 * π * r)</b>। <br>मानों को रखने पर: θ = (<b>${arcLength}</b> * 360) / (2 * 3.14 * <b>${r}</b>)।`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.arcAngleArcher.instruction[currentLanguage]}</p><div class="flex justify-center items-center my-4"><svg width="200" height="200" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#ccc" stroke-width="2"/><path d="M 50 50 L 90 50 A 40 40 0 0 1 ${50 + 40*Math.cos(q.answer*Math.PI/180)} ${50 - 40*Math.sin(q.answer*Math.PI/180)} Z" fill="rgba(0,150,255,0.2)" stroke="#0096ff" stroke-width="1"/><text x="65" y="45" font-size="6">r=${q.r}</text><text x="70" y="65" font-size="6">L=${q.arcLength}</text><text x="55" y="55" font-size="6">θ=?</text></svg></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="${gameData.arcAngleArcher.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-cyan-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                tangentTracer: {
+                    currentQuestion: null,
+                    generateData() { const triples = [[3,4,5], [6,8,10], [5,12,13], [8,15,17]]; const t = triples[Math.floor(Math.random() * triples.length)]; this.currentQuestion = { radius: t[0], distance: t[2], answer: t[1] }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { radius, distance, answer } = this.currentQuestion; return { en: `The radius and tangent are perpendicular, forming a right triangle with the distance to the center as the hypotenuse. <br>Use Pythagoras: <b>d² = r² + t²</b>. <br>So, <b>t² = d² - r² = ${distance**2} - ${radius**2} = ${answer**2}</b>. <br><b>t = √${answer**2}</b>`, or: `ବ୍ୟାସାର୍ଦ୍ଧ ଏବଂ ସ୍ପର୍ଶକ ଲମ୍ବ ଅଟନ୍ତି, ଯାହା କେନ୍ଦ୍ରରୁ ଦୂରତାକୁ କର୍ଣ୍ଣ ଭାବରେ ନେଇ ଏକ ସମକୋଣୀ ତ୍ରିଭୁଜ ଗଠନ କରେ। <br>ପାଇଥାଗୋରାସ୍ ବ୍ୟବହାର କରନ୍ତୁ: <b>d² = r² + t²</b>। <br>ତେଣୁ, <b>t² = d² - r² = ${distance**2} - ${radius**2} = ${answer**2}</b>। <br><b>t = √${answer**2}</b>`, hi: `त्रिज्या और स्पर्श रेखा लंबवत होती हैं, जो केंद्र से दूरी को कर्ण के रूप में लेकर एक समकोण त्रिभुज बनाती हैं। <br>पाइथागोरस का प्रयोग करें: <b>d² = r² + t²</b>। <br>तो, <b>t² = d² - r² = ${distance**2} - ${radius**2} = ${answer**2}</b>। <br><b>t = √${answer**2}</b>`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.tangentTracer.instruction[currentLanguage]}</p><div class="flex justify-center items-center my-4 h-48"><svg width="300" height="150" viewBox="0 0 200 100"><circle cx="50" cy="50" r="40" fill="rgba(190,242,100,0.3)" stroke="#84cc16" stroke-width="2"/><line x1="50" y1="50" x2="180" y2="50" stroke="#666" stroke-width="1"/><line x1="180" y1="50" x2="80" y2="80" stroke="#ef4444" stroke-width="2"/><line x1="50" y1="50" x2="80" y2="80" stroke="#84cc16" stroke-width="1"/><text x="100" y="45" font-size="8">d = ${q.distance}</text><text x="85" y="75" font-size="8" fill="#ef4444">t = ?</text><text x="60" y="60" font-size="8">r = ${q.radius}</text></svg></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="${gameData.tangentTracer.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-lime-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                trigTower: {
+                    currentQuestion: null,
+                    generateData() { const angles = {30: Math.tan(30*Math.PI/180), 45: 1, 60: Math.tan(60*Math.PI/180)}; const angle = [30, 45, 60][Math.floor(Math.random()*3)]; const distance = angle === 45 ? Math.floor(Math.random()*21)+20 : 20; const height = distance * angles[angle]; this.currentQuestion = { angle, distance, answer: Math.round(height) }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { angle, distance, answer } = this.currentQuestion; return { en: `Use tangent, as we have the adjacent side (distance) and want to find the opposite side (height). <br><b>tan(θ) = Opposite / Adjacent</b> <br><b>tan(${angle}°) = h / ${distance}</b> <br><b>h = ${distance} * tan(${angle}°)</b>`, or: `ଟାନ୍ଜେଣ୍ଟ୍ ବ୍ୟବହାର କରନ୍ତୁ, କାରଣ ଆମ ପାଖରେ ସଂଲଗ୍ନ ପାର୍ଶ୍ଵ (ଦୂରତା) ଅଛି ଏବଂ ବିପରୀତ ପାର୍ଶ୍ଵ (ଉଚ୍ଚତା) ଖୋଜିବାକୁ ଚାହୁଁଛୁ। <br><b>tan(θ) = ବିପରୀତ / ସଂଲଗ୍ନ</b> <br><b>tan(${angle}°) = h / ${distance}</b> <br><b>h = ${distance} * tan(${angle}°)</b>`, hi: `स्पर्शज्या का प्रयोग करें, क्योंकि हमारे पास आसन्न भुजा (दूरी) है और हम सम्मुख भुजा (ऊँचाई) ज्ञात करना चाहते हैं। <br><b>tan(θ) = सम्मुख / आसन्न</b> <br><b>tan(${angle}°) = h / ${distance}</b> <br><b>h = ${distance} * tan(${angle}°)</b>`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.trigTower.instruction[currentLanguage]}</p><div class="flex justify-center items-end my-4 h-48"><div class="text-center">🧍</div><div class="w-48 border-b-2 border-black border-dashed"></div><div class="text-center text-4xl">🗼</div></div><div class="text-center font-bold text-xl">d = ${q.distance}m, θ = ${q.angle}°</div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="${gameData.trigTower.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-fuchsia-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                volumeVoyage: {
+                    currentQuestion: null,
+                    generateData() { const r = Math.floor(Math.random() * 4) + 2; const h = Math.floor(Math.random() * 6) + 5; const volume = 3.14 * r * r * h; this.currentQuestion = { r, h, answer: Math.round(volume) }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { r, h, answer } = this.currentQuestion; return { en: `The formula for the volume of a cylinder is <b>V = π * r² * h</b>. <br>Plugging in the values: <br><b>V = 3.14 * ${r}² * ${h}</b> <br><b>V = 3.14 * ${r*r} * ${h}</b>`, or: `ସିଲିଣ୍ଡରର ଆୟତନ ପାଇଁ ସୂତ୍ର ହେଉଛି <b>V = π * r² * h</b>। <br>ମୂଲ୍ୟଗୁଡ଼ିକୁ ସ୍ଥାପନ କଲେ: <br><b>V = 3.14 * ${r}² * ${h}</b> <br><b>V = 3.14 * ${r*r} * ${h}</b>`, hi: `एक सिलेंडर के आयतन का सूत्र है <b>V = π * r² * h</b>। <br>मानों को रखने पर: <br><b>V = 3.14 * ${r}² * ${h}</b> <br><b>V = 3.14 * ${r*r} * ${h}</b>`, answer: answer }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.volumeVoyage.instruction[currentLanguage]}</p><div class="flex justify-center items-center my-4 h-48"><div style="width:100px; height:150px; background:#fecdd3; border:2px solid #fb7185; border-radius:50px/25px; position:relative;"><div style="position:absolute; top:-12px; left:0; width:100px; height:25px; background:#f9a8d4; border:2px solid #f472b6; border-radius:50px/12.5px;"></div></div><div class="ml-4 text-xl font-bold">r = ${q.r}<br/>h = ${q.h}</div></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="${gameData.volumeVoyage.placeholder[currentLanguage]}"/><button id="check-btn" class="px-6 py-3 bg-rose-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init(chapterId)); });
+                    }
+                },
+                constructionCrew: { 
+                    currentQuestion: null,
+                    steps: [
+                        { 
+                            svg: '<svg viewBox="0 0 100 100"><path d="M 10 90 L 50 10 L 90 90" stroke="black" stroke-width="2" fill="none"/></svg>',
+                            options: [
+                                { en: 'Draw an arc from the vertex across both arms.', or: 'ଶୀର୍ଷରୁ ଉଭୟ ବାହୁ ଉପରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'शीर्ष से दोनों भुजाओं पर एक चाप खींचें।', correct: true},
+                                { en: 'Draw a line through the middle.', or: 'ମଝିରେ ଏକ ରେଖା ଅଙ୍କନ କରନ୍ତୁ।', hi: 'बीच में एक रेखा खींचें।', correct: false},
+                                { en: 'Measure the angle with a protractor.', or: 'ପ୍ରୋଟ୍ରାକ୍ଟରରେ କୋଣ ମାପନ୍ତୁ।', hi: 'चाँदे से कोण मापें।', correct: false},
+                            ],
+                            explanation: {
+                                en: 'The first step is always to draw an arc from the vertex that intersects both sides (arms) of the angle. This gives you two points to work from.',
+                                or: 'ପ୍ରଥମ ପଦକ୍ଷେପ ସର୍ବଦା ଶୀର୍ଷରୁ ଏକ ଚାପ ଅଙ୍କନ କରିବା ଯାହା କୋଣର ଉଭୟ ପାର୍ଶ୍ଵକୁ (ବାହୁ) ଛେଦ କରେ। ଏହା ଆପଣଙ୍କୁ କାମ କରିବା ପାଇଁ ଦୁଇଟି ବିନ୍ଦୁ ଦିଏ।',
+                                hi: 'पहला कदम हमेशा शीर्ष से एक चाप खींचना होता है जो कोण के दोनों पक्षों (भुजाओं) को काटता है। यह आपको काम करने के लिए दो बिंदु देता है।'
+                            },
+                            answer: { en: 'Draw an arc from the vertex across both arms.', or: 'ଶୀର୍ଷରୁ ଉଭୟ ବାହୁ ଉପରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'शीर्ष से दोनों भुजाओं पर एक चाप खींचें।' }
+                        },
+                        { 
+                           svg: '<svg viewBox="0 0 100 100"><path d="M 10 90 L 50 10 L 90 90" stroke="black" stroke-width="2" fill="none"/><path d="M 50 10 a 30 30 0 0 1 25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /><path d="M 50 10 a 30 30 0 0 0 -25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /></svg>',
+                            options: [
+                                { en: 'From an intersection point, draw an arc inside the angle.', or: 'ଏକ ଛେଦ ବିନ୍ଦୁରୁ, କୋଣ ଭିତରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'एक प्रतिच्छेदन बिंदु से, कोण के अंदर एक चाप खींचें।', correct: true},
+                                { en: 'Draw the same arc again.', or: 'ସେହି ଚାପକୁ ପୁଣିଥରେ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'वही चाप फिर से खींचें।', correct: false},
+                                { en: 'Connect the intersection points.', or: 'ଛେଦ ବିନ୍ଦୁଗୁଡ଼ିକୁ ସଂଯୋଗ କରନ୍ତୁ।', hi: 'प्रतिच्छेदन बिंदुओं को जोड़ें।', correct: false},
+                            ],
+                            explanation: {
+                                en: 'Place the compass on one of the points where the first arc intersected an arm, and draw another arc in the center of the angle.',
+                                or: 'ପ୍ରଥମ ଚାପ ବାହୁକୁ ଛେଦ କରିଥିବା ବିନ୍ଦୁମାନଙ୍କ ମଧ୍ୟରୁ ଗୋଟିକ ଉପରେ କମ୍ପାସ୍ ରଖନ୍ତୁ, ଏବଂ କୋଣର କେନ୍ଦ୍ରରେ ଆଉ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।',
+                                hi: 'कम्पास को उन बिंदुओं में से एक पर रखें जहां पहला चाप एक भुजा को काटता है, और कोण के केंद्र में एक और चाप खींचें।'
+                            },
+                            answer: { en: 'From an intersection point, draw an arc inside the angle.', or: 'ଏକ ଛେଦ ବିନ୍ଦୁରୁ, କୋଣ ଭିତରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'एक प्रतिच्छेदन बिंदु से, कोण के अंदर एक चाप खींचें।' }
+                        },
+                         { 
+                           svg: '<svg viewBox="0 0 100 100"><path d="M 10 90 L 50 10 L 90 90" stroke="black" stroke-width="2" fill="none"/><path d="M 50 10 a 30 30 0 0 1 25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /><path d="M 50 10 a 30 30 0 0 0 -25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /><path d="M 24.02 25 a 30 30 0 0 1 30 0" stroke="red" stroke-width="1.5" fill="none" /></svg>',
+                            options: [
+                                { en: 'From the other intersection, draw an arc to cross the red one.', or: 'ଅନ୍ୟ ଛେଦରୁ, ଲାଲ୍ ଚାପକୁ ଛେଦ କରିବା ପାଇଁ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'दूसरे प्रतिच्छेदन से, लाल वाले को पार करने के लिए एक चाप खींचें।', correct: true},
+                                { en: 'Draw a line from the vertex to the red arc.', or: 'ଶୀର୍ଷରୁ ଲାଲ୍ ଚାପ ପର୍ଯ୍ୟନ୍ତ ଏକ ରେଖା ଅଙ୍କନ କରନ୍ତୁ।', hi: 'शीर्ष से लाल चाप तक एक रेखा खींचें।', correct: false},
+                                { en: 'Erase the blue arc.', or: 'ନୀଳ ଚାପକୁ ଲିଭାନ୍ତୁ।', hi: 'नीले चाप को मिटा दें।', correct: false},
+                            ],
+                             explanation: {
+                                en: "Without changing the compass width, move to the other intersection point (on the other arm) and draw a second arc that crosses the first one you just drew.",
+                                or: 'କମ୍ପାସର ପ୍ରସ୍ଥ ପରିବର୍ତ୍ତନ ନକରି, ଅନ୍ୟ ଛେଦ ବିନ୍ଦୁକୁ (ଅନ୍ୟ ବାହୁ ଉପରେ) ଯାଆନ୍ତୁ ଏବଂ ଆପଣ ଅଙ୍କନ କରିଥିବା ପ୍ରଥମ ଚାପକୁ ଛେଦ କରୁଥିବା ଦ୍ୱିତୀୟ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।',
+                                hi: 'कम्पास की चौड़ाई को बदले बिना, दूसरे प्रतिच्छेदन बिंदु (दूसरी भुजा पर) पर जाएं और एक दूसरा चाप खींचें जो आपके द्वारा अभी खींचे गए पहले चाप को काटता है।'
+                            },
+                            answer: { en: 'From the other intersection, draw an arc to cross the red one.', or: 'ଅନ୍ୟ ଛେଦରୁ, ଲାଲ୍ ଚାପକୁ ଛେଦ କରିବା ପାଇଁ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'दूसरे प्रतिच्छेदन से, लाल वाले को पार करने के लिए एक चाप खींचें।' }
                         }
-                        const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
-
-                        gameTitle.textContent = textContent.chapters[0].units[1].title[currentLanguage];
+                    ],
+                    shuffle(array) { let c = array.length, r, t; while (c !== 0) { r = Math.floor(Math.random() * c); c--; t = array[c]; array[c] = array[r]; array[r] = t; } return array; },
+                    generateData() { this.currentQuestion = this.steps[Math.floor(Math.random() * this.steps.length)]; return this.currentQuestion; },
+                    getSolutionExplanation() { const { explanation, answer } = this.currentQuestion; return { en: explanation.en, or: explanation.or, hi: explanation.hi, answer: answer[currentLanguage] }; },
+                    init(chapterId) {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        const shuffledOptions = this.shuffle([...q.options]);
                         gameContent.innerHTML = `
-                            <div class="p-4 rounded-lg" style="background-color: #F3E9D2; border: 3px solid #C68B59;">
-                                <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">
-                                    ${gameData.treasureHunt.instruction[currentLanguage]} <strong>${gameData.treasureHunt.place[currentQuest.place][currentLanguage]}</strong> ${gameData.treasureHunt.inTheNumber[currentLanguage]}...
-                                </p>
-                                <p class="text-center text-5xl font-bold my-6" style="font-family: 'Courier New', monospace; color: #5C2E00;">${numberStr}</p>
+                            <p class="text-center text-lg mb-2 lang-${currentLanguage}-body">${gameData.constructionCrew.instruction[currentLanguage]}</p>
+                            <div class="flex justify-center items-center my-2 h-48 border rounded-lg bg-sky-50">${q.svg}</div>
+                            <div class="grid grid-cols-1 gap-3 mt-4">
+                                ${shuffledOptions.map(opt => `<button class="game-option-btn p-3 text-left rounded-lg lang-${currentLanguage}-body" data-correct="${opt.correct}">${opt[currentLanguage]}</button>`).join('')}
                             </div>
-                            <div class="flex justify-center items-center gap-6 my-8">
-                                ${shuffledOptions.map(opt => `
-                                    <button class="game-option-btn p-6 rounded-full text-2xl font-bold bg-yellow-500 text-white border-4 border-yellow-700 hover:bg-yellow-600 transition-all" data-correct="${opt === currentQuest.answer}">${opt}</button>
-                                `).join('')}
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-
-                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => {
-                            btn.addEventListener('click', e => {
-                                showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init());
-                            });
-                        });
-                    }
-                },
-                 spaceInvaders: {
-                    init() {
-                        const targetMultiple = 7;
-                        gameTitle.textContent = textContent.chapters[1].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.spaceInvaders.instruction[currentLanguage]} <strong>${targetMultiple}</strong></p>
-                            <div id="invaders-game-area">
-                                <div class="player-ship"></div>
-                            </div>
-                            <div class="text-center mt-4">
-                                <p class="text-sm text-gray-500 lang-${currentLanguage}-body">Click on the correct falling numbers!</p>
-                            </div>
-                             <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        const gameArea = document.getElementById('invaders-game-area');
-                        
-                        for(let i=0; i<10; i++){
-                            const invader = document.createElement('div');
-                            invader.className = 'invader';
-                            const num = Math.floor(Math.random() * 50) + 1;
-                            invader.textContent = num;
-                            invader.style.left = `${Math.random() * 90}%`;
-                            invader.style.animationDuration = `${Math.random() * 5 + 5}s`;
-                            invader.style.animationDelay = `${Math.random() * 10}s`;
-                            invader.addEventListener('click', () => {
-                                const isCorrect = num % targetMultiple === 0;
-                                if(isCorrect) {
-                                   invader.style.color = '#feca57';
-                                   invader.textContent = '💥';
-                                   setTimeout(()=> invader.remove(), 500);
-                                }
-                                showFeedback(isCorrect, () => {});
-                            });
-                            gameArea.appendChild(invader);
-                        }
-                    }
-                },
-                escapeRoom: {
-                    init() {
-                        const numberToFactor = 48;
-                        const keys = [12, 15, 7];
-                        const correctKey = 12;
-
-                        gameTitle.textContent = textContent.chapters[1].units[1].title[currentLanguage];
-                        gameContent.innerHTML = `
-                             <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.escapeRoom.instruction[currentLanguage]} <strong>${numberToFactor}</strong>?</p>
-                             <div class="flex justify-center items-center gap-6 my-8">
-                                 ${keys.map(key => `
-                                     <button class="key-btn p-6 bg-yellow-400 rounded-full text-2xl font-bold hover:bg-yellow-500 transition-colors" data-key="${key}">🔑 ${key}</button>
-                                 `).join('')}
-                             </div>
-                             <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        document.querySelectorAll('.key-btn').forEach(btn => {
-                            btn.addEventListener('click', () => {
-                                const isCorrect = parseInt(btn.dataset.key) === correctKey;
-                                showFeedback(isCorrect, () => this.init());
-                            });
-                        });
-                    }
-                },
-                shapeMagic: {
-                    init() {
-                        const questionData = gameData.shapeMagic.questions;
-                        const q = questionData[Math.floor(Math.random() * questionData.length)];
-                        
-                        gameTitle.textContent = textContent.chapters[2].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-2xl font-bold my-6 lang-${currentLanguage}-body">"${q.q[currentLanguage]}"</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                ${q.o.map((opt, index) => `
-                                    <button class="game-option-btn p-4 rounded-lg text-xl" data-correct="${index === q.a}">
-                                        <span class="lang-${currentLanguage}-body">${opt[currentLanguage]}</span>
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => {
-                            btn.addEventListener('click', e => {
-                                showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init());
-                            });
-                        });
-                    }
-                },
-                timeTraveler: {
-                    init() {
-                        const startYear = Math.floor(Math.random() * 50) + 10;
-                        const travelTime = Math.floor(Math.random() * 10) + 2;
-                        const isFuture = Math.random() > 0.5;
-                        const endYear = isFuture ? startYear + travelTime : startYear - travelTime;
-
-                        gameTitle.textContent = textContent.chapters[3].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <div class="text-center">
-                                <p class="text-lg lang-${currentLanguage}-body">${gameData.timeTraveler.start[currentLanguage]} <strong>${startYear}</strong>.</p>
-                                <p class="text-xl font-bold my-4 lang-${currentLanguage}-body">${gameData.timeTraveler.mission[currentLanguage]} ${gameData.timeTraveler.travel[currentLanguage]} <strong>${travelTime}</strong> ${isFuture ? gameData.timeTraveler.yearsFuture[currentLanguage] : gameData.timeTraveler.yearsPast[currentLanguage]}</p>
-                            </div>
-                            <div class="number-line">
-                                <span class="font-bold text-gray-600">${startYear - travelTime - 2}</span>
-                                <span class="font-bold text-gray-600">...</span>
-                                <div class="time-traveler" style="left: 48%;">🚀</div>
-                                <span class="font-bold text-gray-600">...</span>
-                                <span class="font-bold text-gray-600">${startYear + travelTime + 2}</span>
-                            </div>
-                             <div class="flex justify-center items-center gap-4">
-                                <input id="game-answer" type="number" class="p-2 text-2xl text-center w-24 border-2 rounded-lg" />
-                                <button id="check-btn" class="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        document.getElementById('check-btn').addEventListener('click', () => {
-                            const answer = document.getElementById('game-answer').value;
-                            showFeedback(parseInt(answer) === endYear, () => this.init());
-                        });
-                    }
-                },
-                 pizzaParty: {
-                    init() {
-                        const numerator = 3;
-                        const denominator = 8;
-                        gameTitle.textContent = textContent.chapters[4].units[0].title[currentLanguage];
-                        
-                        let slicesHTML = '';
-                        for (let i = 0; i < denominator; i++) {
-                            const angle = (i / denominator) * 360;
-                            const x1 = 100 + 90 * Math.cos((angle - 90) * Math.PI / 180);
-                            const y1 = 100 + 90 * Math.sin((angle - 90) * Math.PI / 180);
-                            const x2 = 100 + 90 * Math.cos((angle - 90 + 360/denominator) * Math.PI / 180);
-                            const y2 = 100 + 90 * Math.sin((angle - 90 + 360/denominator) * Math.PI / 180);
-                            slicesHTML += `<path class="pizza-slice" d="M100,100 L${x1},${y1} A90,90 0 0,1 ${x2},${y2} Z" data-selected="false"></path>`;
-                        }
-
-                        gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.pizzaParty.instruction[currentLanguage]} <strong class="text-2xl">${numerator}/${denominator}</strong></p>
-                            <div class="flex justify-center my-4">
-                                <svg viewBox="0 0 200 200" width="250" height="250">
-                                    <circle cx="100" cy="100" r="95" class="pizza-crust" />
-                                    ${slicesHTML}
-                                </svg>
-                            </div>
-                            <div class="flex justify-center">
-                                <button id="check-btn" class="px-6 py-3 bg-pink-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-
-                        document.querySelectorAll('.pizza-slice').forEach(slice => {
-                            slice.addEventListener('click', () => {
-                                const isSelected = slice.dataset.selected === 'true';
-                                slice.dataset.selected = !isSelected;
-                                slice.style.fill = !isSelected ? '#feca57' : '#ffdd59';
-                            });
-                        });
-                        
-                        document.getElementById('check-btn').addEventListener('click', () => {
-                            const selectedCount = document.querySelectorAll('.pizza-slice[data-selected="true"]').length;
-                            showFeedback(selectedCount === numerator, () => this.init());
-                        });
-                    }
-                },
-                decimalDash: {
-                    init() {
-                        const fraction = {n: 7, d: 10};
-                        const decimal = 0.7;
-                        const options = [0.07, 7.0, 0.7].sort(() => Math.random() - 0.5);
-                        gameTitle.textContent = textContent.chapters[5].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-2xl font-bold my-6 lang-${currentLanguage}-body">${gameData.decimalDash.instruction[currentLanguage]} <strong>${fraction.n}/${fraction.d}</strong>?</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                ${options.map(opt => `
-                                    <button class="game-option-btn p-6 rounded-lg text-2xl" data-correct="${opt === decimal}">
-                                        ${opt}
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => {
-                            btn.addEventListener('click', e => {
-                                showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init());
-                            });
-                        });
-                    }
-                },
-                marketMayhem: {
-                    init() {
-                        const items = [{n:{en:'Apples', or:'ସେଓ', hi: 'सेब'}, p: 45.50}, {n:{en:'Milk', or:'କ୍ଷୀର', hi: 'दूध'}, p: 25.00}, {n:{en:'Bread', or:'ପାଉଁରୁଟି', hi: 'ब्रेड'}, p: 32.75}];
-                        const total = items.reduce((sum, item) => sum + item.p, 0);
-                        gameTitle.textContent = textContent.chapters[6].units[0].title[currentLanguage];
-
-                        gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.marketMayhem.instruction[currentLanguage]}</p>
-                            <div class="grid grid-cols-3 gap-4 my-6">
-                                ${items.map(item => `
-                                    <div class="item-card p-4 rounded-lg text-center">
-                                        <p class="text-xl lang-${currentLanguage}-body">${item.n[currentLanguage]}</p>
-                                        <p class="text-2xl font-bold">₹${item.p.toFixed(2)}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="text-center">
-                                <button id="check-btn" class="px-6 py-3 bg-red-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.marketMayhem.calculate[currentLanguage]}</button>
-                            </div>
-                             <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        document.getElementById('check-btn').addEventListener('click', () => {
-                            const feedback = document.getElementById('feedback-container');
-                            const canAfford = total <= 100;
-                            feedback.innerHTML = `
-                                <p class="text-xl">${gameData.marketMayhem.total[currentLanguage]} ₹${total.toFixed(2)}</p>
-                                <p class="text-3xl font-bold ${canAfford ? 'text-green-600' : 'text-red-600'}">${canAfford ? gameData.marketMayhem.yes[currentLanguage] : gameData.marketMayhem.no[currentLanguage]}</p>
-                            `;
-                        });
-                    }
-                },
-                 mountainClimber: {
-                    init() {
-                        const start = Math.floor(Math.random() * 11) - 5; // -5 to +5
-                        const change = Math.floor(Math.random() * 10) + 1; // 1 to 10
-                        const isUp = Math.random() > 0.5;
-                        const end = isUp ? start + change : start - change;
-
-                        gameTitle.textContent = textContent.chapters[7].units[0].title[currentLanguage];
-
-                        gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-2 lang-${currentLanguage}-body">${gameData.mountainClimber.instruction[currentLanguage]}</p>
-                            <div class="flex justify-around items-center">
-                                <div class="w-2/3">
-                                    <p class="text-md my-2 lang-${currentLanguage}-body">${gameData.mountainClimber.start[currentLanguage]} <strong>${start > 0 ? '+' : ''}${start}m</strong>.</p>
-                                    <p class="text-md my-2 lang-${currentLanguage}-body">${gameData.mountainClimber.change[currentLanguage]} <strong>${change}</strong> ${isUp ? gameData.mountainClimber.up[currentLanguage] : gameData.mountainClimber.down[currentLanguage]}</p>
-                                    <p class="text-lg font-bold my-4 lang-${currentLanguage}-body">${gameData.mountainClimber.question[currentLanguage]}</p>
-                                    <div class="flex items-center gap-4">
-                                        <input id="game-answer" type="number" class="p-2 text-2xl text-center w-24 border-2 rounded-lg" />
-                                        <button id="check-btn" class="px-6 py-3 bg-orange-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
-                                    </div>
-                                </div>
-                                <div class="w-1/3 mountain-bg">
-                                    <div class="level-marker" style="bottom: 50%;"><span class="bg-black/20 px-1 rounded">0m</span></div>
-                                    <div class="climber" style="bottom: calc(50% + ${start * 5}px);">🧗</div>
-                                </div>
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-
-                        document.getElementById('check-btn').addEventListener('click', () => {
-                            const answer = document.getElementById('game-answer').value;
-                            const isCorrect = parseInt(answer) === end;
-                            showFeedback(isCorrect, () => this.init());
-                            if (isCorrect) {
-                                document.querySelector('.climber').style.bottom = `calc(50% + ${end * 5}px)`;
-                            }
-                        });
-                    }
-                },
-                polygonPuzzle: {
-                    init() {
-                        const questionData = gameData.polygonPuzzle.questions;
-                        const q = questionData[Math.floor(Math.random() * questionData.length)];
-                        
-                        gameTitle.textContent = textContent.chapters[8].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-2xl font-bold my-4 lang-${currentLanguage}-body">${q.q[currentLanguage]}</p>
-                            <div class="shape-canvas h-48 my-4">
-                                <!-- Visuals can be added here with SVG -->
-                                <p class="text-5xl">${q.o[q.a].en === '4' ? '⬛' : (q.o[q.a].en === 'A triangle' ? '🔺': '❔')}</p>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                ${q.o.map((opt, index) => `
-                                    <button class="game-option-btn p-4 rounded-lg text-xl" data-correct="${index === q.a}">
-                                        <span class="lang-${currentLanguage}-body">${opt[currentLanguage] || opt}</span>
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => {
-                            btn.addEventListener('click', e => {
-                                showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init());
-                            });
-                        });
-                    }
-                },
-                variableVoyager: {
-                    init() {
-                        const num1 = Math.floor(Math.random() * 10) + 1;
-                        const result = Math.floor(Math.random() * 10) + num1 + 1; // ensure result is larger
-                        const answer = result - num1;
-
-                        gameTitle.textContent = textContent.chapters[9].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                             <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.variableVoyager.instruction[currentLanguage]}</p>
-                             <div class="voyager-bg my-6">
-                                 🚀 X + ${num1} = ${result}
-                             </div>
-                             <div class="flex justify-center items-center gap-4">
-                                 <p class="text-xl font-bold lang-${currentLanguage}-body">X = </p>
-                                <input id="game-answer" type="number" class="p-2 text-2xl text-center w-24 border-2 rounded-lg" />
-                                <button id="check-btn" class="px-6 py-3 bg-lime-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        document.getElementById('check-btn').addEventListener('click', () => {
-                            const userAnswer = document.getElementById('game-answer').value;
-                            showFeedback(parseInt(userAnswer) === answer, () => this.init());
-                        });
-                    }
-                },
-                gardenArchitect: {
-                     init() {
-                        const width = Math.floor(Math.random() * 5) + 4; // 4-8
-                        const height = Math.floor(Math.random() * 5) + 4; // 4-8
-                        const isPerimeter = Math.random() > 0.5;
-                        const answer = isPerimeter ? 2 * (width + height) : width * height;
-
-                        gameTitle.textContent = textContent.chapters[10].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.gardenArchitect.instruction[currentLanguage]}</p>
-                            <p class="text-center text-xl font-bold my-4 lang-${currentLanguage}-body">${isPerimeter ? gameData.gardenArchitect.question_perimeter[currentLanguage] : gameData.gardenArchitect.question_area[currentLanguage]}</p>
-                             <div class="flex justify-center my-6">
-                                 <div class="garden-plot" style="width: ${width*25}px; height: ${height*25}px;">
-                                     <span class="dimension-label" style="top: -25px; left: 50%; transform: translateX(-50%);">${width}${gameData.gardenArchitect.unit[currentLanguage]}</span>
-                                     <span class="dimension-label" style="left: -40px; top: 50%; transform: translateY(-50%) rotate(-90deg);">${height}${gameData.gardenArchitect.unit[currentLanguage]}</span>
-                                 </div>
-                             </div>
-                            <div class="flex justify-center items-center gap-4">
-                                <input id="game-answer" type="number" class="p-2 text-2xl text-center w-32 border-2 rounded-lg" />
-                                <span class="text-xl font-bold">${isPerimeter ? gameData.gardenArchitect.unit[currentLanguage] : gameData.gardenArchitect.unit_sq[currentLanguage]}</span>
-                            </div>
-                             <div class="flex justify-center mt-4">
-                                <button id="check-btn" class="px-6 py-3 bg-fuchsia-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-
-                         document.getElementById('check-btn').addEventListener('click', () => {
-                            const userAnswer = document.getElementById('game-answer').value;
-                            showFeedback(parseInt(userAnswer) === answer, () => this.init());
-                        });
-                    }
-                },
-                fruitStandFrenzy: {
-                    init() {
-                        const fruits = [
-                            { name: { en: 'Apples', or: 'ସେଓ', hi: 'सेब' }, count: 8, color: '#ef4444' },
-                            { name: { en: 'Bananas', or: 'କଦଳୀ', hi: 'केले' }, count: 12, color: '#facc15' },
-                            { name: { en: 'Oranges', or: 'କମଳା', hi: 'संतरे' }, count: 10, color: '#f97316' }
-                        ];
-                        const questionData = gameData.fruitStandFrenzy.questions;
-                        const questionIndex = Math.floor(Math.random() * questionData.length);
-                        const question = {...questionData[questionIndex]};
-                        
-                        // Dynamically find correct answer for the 'most sold' question
-                        if (question.q.en === 'Which fruit was sold the most?') {
-                            let maxCount = -1;
-                            let mostSoldIndex = -1;
-                            fruits.forEach((fruit, index) => {
-                                if (fruit.count > maxCount) {
-                                    maxCount = fruit.count;
-                                    mostSoldIndex = index;
-                                }
-                            });
-                            question.a = mostSoldIndex;
-                        } else if (question.q.en === 'How many fruits were sold in total?') {
-                            const totalFruits = fruits.reduce((sum, f) => sum + f.count, 0);
-                            question.o = [totalFruits - 5, totalFruits + 5, totalFruits].sort(() => Math.random() - 0.5);
-                            question.a = question.o.indexOf(totalFruits);
-                        }
-
-
-                        const chartHeight = 250;
-                        const barWidth = 50;
-                        const maxCount = Math.max(...fruits.map(f => f.count));
-
-                        gameTitle.textContent = textContent.chapters[11].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.fruitStandFrenzy.instruction[currentLanguage]}</p>
-                            <div class="flex justify-center items-end h-[${chartHeight}px] gap-8 border-b-4 border-gray-400 p-4">
-                                ${fruits.map(fruit => `
-                                    <div class="flex flex-col items-center">
-                                        <div style="height: ${(fruit.count / maxCount) * (chartHeight-40)}px; width: ${barWidth}px; background-color: ${fruit.color};" class="rounded-t-lg"></div>
-                                        <p class="mt-2 font-bold lang-${currentLanguage}-body">${fruit.name[currentLanguage]}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <p class="text-center text-2xl font-bold my-6 lang-${currentLanguage}-body">"${question.q[currentLanguage]}"</p>
-                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                 ${question.o.map((opt, index) => `
-                                     <button class="game-option-btn p-4 rounded-lg text-xl" data-correct="${index === question.a}">
-                                         <span class="lang-${currentLanguage}-body">${typeof opt === 'object' ? opt[currentLanguage] : opt}</span>
-                                     </button>
-                                 `).join('')}
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                         gameContent.querySelectorAll('.game-option-btn').forEach(btn => {
-                            btn.addEventListener('click', e => {
-                                showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init());
-                            });
-                        });
-                    }
-                },
-                blueprintBuilder: {
-                    init() {
-                        const questionData = gameData.blueprintBuilder.questions;
-                        const q = questionData[Math.floor(Math.random() * questionData.length)];
-                        
-                        gameTitle.textContent = textContent.chapters[12].units[0].title[currentLanguage];
-                        gameContent.innerHTML = `
-                            <p class="text-center text-xl font-bold my-4 lang-${currentLanguage}-body">${gameData.blueprintBuilder.instruction[currentLanguage]}</p>
-                            <p class="text-center text-2xl my-4 p-4 bg-blue-100 border-l-4 border-blue-500 rounded lang-${currentLanguage}-body">"${q.q[currentLanguage]}"</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                                ${q.o.map((opt, index) => `
-                                    <button class="game-option-btn p-4 rounded-lg text-xl flex flex-col items-center gap-2" data-correct="${index === q.a}">
-                                        <span class="tool-icon">${opt.en === 'Ruler' ? '📏' : (opt.en === 'Compass' ? '🧭' : '📐')}</span>
-                                        <span class="lang-${currentLanguage}-body">${opt[currentLanguage]}</span>
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div id="feedback-container" class="text-center mt-6"></div>
-                        `;
-                        
-                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => {
-                            btn.addEventListener('click', e => {
-                                showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init());
-                            });
-                        });
+                            <div id="feedback-container" class="text-center mt-6"></div>`;
+                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => btn.addEventListener('click', e => { showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init(chapterId)); }));
                     }
                 },
                 comingSoon: {
-                    init() {
-                        gameTitle.textContent = currentLanguage === 'en' ? 'Coming Soon!' : (currentLanguage === 'or' ? 'ଶୀଘ୍ର ଆସୁଛି' : 'जल्द आ रहा है');
-                        gameContent.innerHTML = `<p class="text-center text-2xl p-8 lang-${currentLanguage}-body">${currentLanguage === 'en' ? 'This game is under construction. Check back later!' : (currentLanguage === 'or' ? 'ଏହି ଖେଳ ନିର୍ମାଣାଧୀନ ଅଛି | ପରେ ପୁଣି ଦେଖନ୍ତୁ!' : 'यह गेम निर्माणाधीन है। बाद में फिर से देखें!')}</p>`;
+                    init(chapterId) {
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-2xl p-8 lang-${currentLanguage}-body">${currentLanguage === 'en' ? 'This game is under construction. Check back later!' : (currentLanguage === 'or' ? 'ଏହି ଖେଳ ନିର୍ମାଣାଧୀନ ଅଛି | ପରେ ପୁଣି ଦେଖନ୍ତୁ!' : 'यह गेम निर्माणाधीन है। बाद में फिर देखें!')}</p>`;
                     }
                 }
             };
             
-            function showFeedback(isCorrect, nextCallback) {
+            function showFeedback(isCorrect, nextCallback, message) {
                 const feedbackContainer = document.getElementById('feedback-container');
-                if(!feedbackContainer) return;
+                if (!feedbackContainer) return;
+
+                gameContent.querySelectorAll('button, input').forEach(el => el.disabled = true);
                 
                 if (isCorrect) {
-                    feedbackContainer.innerHTML = `<p class="text-2xl font-bold text-green-600">${gameData.correct[currentLanguage]}</p>`;
-                    setTimeout(() => {
-                        if(nextCallback) nextCallback();
+                    feedbackContainer.innerHTML = `<p class="text-2xl font-bold text-green-600">${message || gameData.correct[currentLanguage]}</p>`;
+                    setTimeout(() => { 
+                        if (gameModal.classList.contains('hidden')) return;
+                        if(nextCallback) nextCallback(); 
                         if(feedbackContainer) feedbackContainer.innerHTML = '';
                     }, 1500);
                 } else {
-                    feedbackContainer.innerHTML = `<p class="text-2xl font-bold text-red-600">${gameData.tryAgain[currentLanguage]}</p>`;
-                     setTimeout(() => {
-                         if(feedbackContainer) feedbackContainer.innerHTML = '';
-                    }, 1000);
+                    const solution = activeGame.getSolutionExplanation();
+                    feedbackContainer.innerHTML = `
+                        <p class="text-2xl font-bold text-red-600 mb-4">${gameData.tryAgain[currentLanguage]}</p>
+                        <div class="solution-box text-left">
+                            <h3 class="font-bold text-lg mb-2">${gameData.solutionTitle[currentLanguage]}</h3>
+                            <p class="text-gray-700 lang-${currentLanguage}-body">${solution[currentLanguage]}</p>
+                            <p class="mt-3"><b>${gameData.correctAnswerIs[currentLanguage]}: <span class="text-blue-600">${solution.answer}</span></b></p>
+                            <button id="next-q-btn" class="mt-4 w-full px-6 py-3 bg-blue-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.nextQuestion[currentLanguage]}</button>
+                        </div>`;
+
+                    document.getElementById('next-q-btn').addEventListener('click', () => {
+                        if (nextCallback) nextCallback();
+                    });
                 }
             }
             
-            // --- LANGUAGE & NAVIGATION ---
             function updateLanguage() {
-                 document.querySelectorAll('[class*="lang-"]').forEach(el => {
+                document.querySelectorAll('[id^="platform-title"], .chapter-title, .lang-en, .lang-or, .lang-hi, .lang-or-body, .lang-hi-body').forEach(el => {
                     el.classList.remove('lang-en', 'lang-or', 'lang-hi', 'lang-or-body', 'lang-hi-body');
-                    const isTitle = el.tagName === 'H1' || el.tagName === 'H2' || el.classList.contains('play-now-btn') || el.classList.contains('chapter-title') || el.classList.contains('unit-button');
-                    
-                    if (isTitle) {
+                    if (el.classList.contains('chapter-title') || el.tagName === 'H1' || el.tagName === 'H2' || el.classList.contains('play-now-btn')) {
                          el.classList.add(`lang-${currentLanguage}`);
                     } else {
-                         el.classList.add(currentLanguage === 'or' ? 'lang-or-body' : (currentLanguage === 'hi' ? 'lang-hi-body' : 'lang-en'));
+                         el.classList.add(`lang-${currentLanguage}-body`);
                     }
                 });
-
-                platformTitle.textContent = textContent.platformTitle[currentLanguage];
-                startScreen.querySelector('h1').textContent = {en: '6th Grade Math', or: 'ଷଷ୍ଠ ଶ୍ରେଣୀ ଗଣିତ', hi: 'कक्षा 6 गणित'}[currentLanguage];
-                startScreen.querySelector('p').textContent = {en: 'The Next Level of Adventure!', or: 'ସାହସିକତାର ପରବର୍ତ୍ତୀ ସ୍ତର!', hi: 'साहसिक कार्य का अगला स्तर!'}[currentLanguage];
-                playNowBtn.textContent = {en: 'Play Now', or: 'ଏବେ ଖେଳନ୍ତୁ', hi: 'अब खेलें'}[currentLanguage];
-
-                // Re-render views
-                const isUnitView = mainContent.querySelector('#back-to-chapters');
-                 if (isUnitView) {
-                    const h2Element = mainContent.querySelector('h2');
-                    let chapterId = null;
-                    for (const ch of textContent.chapters) {
-                        if(ch.title.en === h2Element.textContent || ch.title.or === h2Element.textContent || ch.title.hi === h2Element.textContent) {
-                            chapterId = ch.id;
-                            break;
-                        }
-                    }
-                    if(chapterId) {
-                       renderUnits(chapterId);
-                    } else {
-                       renderChapters();
-                    }
-                } else {
-                    renderChapters();
-                }
                 
-                // Update active button style
-                [langEnBtn, langOrBtn, langHiBtn].forEach(btn => {
-                    btn.classList.remove('bg-emerald-500', 'text-white');
-                    btn.classList.add('text-gray-600');
-                });
-                const activeBtn = document.getElementById(`lang-${currentLanguage}-btn`);
-                if (activeBtn) {
-                    activeBtn.classList.add('bg-emerald-500', 'text-white');
-                    activeBtn.classList.remove('text-gray-600');
+                document.getElementById('platform-title').textContent = textContent.platformTitle[currentLanguage];
+                document.querySelector('#start-screen h1').textContent = {en: '10th Grade Math', or: 'ଦଶମ ଶ୍ରେଣୀ ଗଣିତ', hi: 'कक्षा 10 गणित'}[currentLanguage];
+                document.querySelector('#start-screen p').textContent = {en: 'The Next Level of Adventure!', or: 'ସାହସିକତାର ପରବର୍ତ୍ତୀ ସ୍ତର!', hi: 'साहसिक कार्य का अगला स्तर!'}[currentLanguage];
+                document.getElementById('play-now-btn').textContent = {en: 'Play Now', or: 'ଏବେ ଖେଳନ୍ତୁ', hi: 'अब खेलें'}[currentLanguage];
+                
+                renderChapters();
+                updateActiveLangButtons();
+
+                // If a game modal is open, re-initialize it to update the language
+                if (activeGame && !gameModal.classList.contains('hidden')) {
+                    const chapterId = gameTitle.dataset.chapterId;
+                    if (chapterId) {
+                        const gameId = textContent.chapters.find(c => c.id === chapterId)?.units[0]?.game;
+                        const game = games[gameId] || games.comingSoon;
+                        game.init(chapterId);
+                    }
                 }
             }
             
-            // --- EVENT LISTENERS ---
-            playNowBtn.addEventListener('click', () => {
-                startScreen.style.transition = 'opacity 0.5s ease';
+            function updateActiveLangButtons() {
+                const allButtons = document.querySelectorAll('[id$="-lang-en-btn"], [id$="-lang-or-btn"], [id$="-lang-hi-btn"]');
+                allButtons.forEach(btn => {
+                    btn.classList.remove('bg-yellow-400', 'text-white', 'font-extrabold');
+                    btn.classList.add('text-gray-600');
+                });
+
+                const activeButtons = document.querySelectorAll(`[id$="-lang-${currentLanguage}-btn"]`);
+                activeButtons.forEach(btn => {
+                    btn.classList.add('bg-yellow-400', 'text-white', 'font-extrabold');
+                });
+            }
+
+            function setLanguage(lang) {
+                currentLanguage = lang;
+                updateLanguage();
+            }
+
+            // --- Event Listeners ---
+            document.querySelectorAll('[id$="-lang-en-btn"]').forEach(btn => btn.addEventListener('click', () => setLanguage('en')));
+            document.querySelectorAll('[id$="-lang-or-btn"]').forEach(btn => btn.addEventListener('click', () => setLanguage('or')));
+            document.querySelectorAll('[id$="-lang-hi-btn"]').forEach(btn => btn.addEventListener('click', () => setLanguage('hi')));
+
+            document.getElementById('play-now-btn').addEventListener('click', () => {
+                const startScreen = document.getElementById('start-screen');
+                const appContainer = document.getElementById('app-container');
                 startScreen.style.opacity = '0';
                 setTimeout(() => {
-                    startScreen.style.display = 'none';
-                    appContainer.style.display = 'block';
-                    setTimeout(() => appContainer.style.opacity = '1', 50); // fade in
+                    startScreen.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    appContainer.style.opacity = '1';
                 }, 500);
             });
-            
-            langEnBtn.addEventListener('click', () => { if (currentLanguage !== 'en') { currentLanguage = 'en'; updateLanguage(); } });
-            langOrBtn.addEventListener('click', () => { if (currentLanguage !== 'or') { currentLanguage = 'or'; updateLanguage(); } });
-            langHiBtn.addEventListener('click', () => { if (currentLanguage !== 'hi') { currentLanguage = 'hi'; updateLanguage(); } });
 
             mainContent.addEventListener('click', (e) => {
                 const chapterCard = e.target.closest('.chapter-card');
-                if (chapterCard) renderUnits(chapterCard.id);
-                if (e.target.closest('#back-to-chapters')) renderChapters();
-                
-                const unitButton = e.target.closest('.unit-button');
-                if (unitButton && unitButton.dataset.game !== 'none') {
-                    const gameName = unitButton.dataset.game;
-                    if (games[gameName]) {
-                        games[gameName].init();
-                        gameModal.classList.remove('hidden');
-                    }
+                if (chapterCard) {
+                    const gameId = chapterCard.dataset.game;
+                    const chapterId = chapterCard.dataset.chapterId;
+                    // Store chapterId on the modal title to retrieve it if the language changes
+                    gameTitle.dataset.chapterId = chapterId;
+                    const game = games[gameId] || games.comingSoon;
+                    game.init(chapterId); // Pass chapterId for 'comingSoon'
+                    gameModal.classList.remove('hidden');
                 }
             });
-            
-            closeModalBtn.addEventListener('click', () => {
-                gameModal.classList.add('hidden');
-                gameContent.innerHTML = ''; // Clear content to stop any running intervals if any were added
-            });
 
-            // --- INITIALIZATION ---
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                gameModal.classList.add('hidden');
+                gameContent.innerHTML = '';
+                activeGame = null;
+            });
+            
+            // --- Initial Load ---
             createBackground();
             updateLanguage();
-
         });
     </script>
 </body>
