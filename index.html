@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>गणित का खेल - 10th Grade Math Adventures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the gamified platform */
+        body {
+            font-family: cursive, sans-serif; /* Fun, rounded system font */
+            background: linear-gradient(to bottom, #2c3e50, #4ca1af); /* A slightly more mature gradient */
+            color: #333;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Language-specific fonts */
+        .lang-en { font-family: cursive, sans-serif; }
+        .lang-or, .lang-hi { font-family: sans-serif; font-weight: 700; }
+        .lang-or-body, .lang-hi-body { font-family: sans-serif; font-weight: 400; }
+
+        #background-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: -1;
+        }
+
+        .start-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; text-align: center;
+            background: linear-gradient(to bottom, #2c3e50, #4ca1af);
+            color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            transition: opacity 0.5s ease-out;
+        }
+
+        .start-screen h1 { font-size: 4rem; margin-bottom: 1rem; }
+
+        .play-now-btn {
+            font-size: 2rem; padding: 1rem 3rem; border-radius: 50px;
+            background: #f39c12; color: white; border: 5px solid white; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .play-now-btn:hover { transform: scale(1.1); background: #e67e22; }
+        
+        #app-container { opacity: 0; transition: opacity 1s ease-in-out; }
+
+        .chapter-card {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer; text-align: center; padding: 1.5rem; border-radius: 1.5rem;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .chapter-card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .chapter-title { color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+
+        .modal { background: rgba(0, 0, 0, 0.6); }
+        .modal-content {
+            background: white; border-radius: 1.5rem; border: 5px solid #f1c40f;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Generic Game Styles */
+        .game-option-btn {
+            background-color: #f0f0f0; border: 2px solid #ddd;
+            transition: all 0.2s ease;
+        }
+        .game-option-btn:hover {
+            transform: scale(1.05); border-color: #f1c40f; background-color: #fffbe6;
+        }
+        
+        /* Animation for floating islands */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating-island {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Equation Balancer */
+        .equation-box {
+            background-color: #eefbff;
+            border-left: 5px solid #3498db;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Quadratic Catapult */
+        .catapult-game {
+            background: #d4e6f1 url('https://www.transparenttextures.com/patterns/light-grass.png');
+            border-radius: 1rem;
+            position: relative;
+            height: 300px;
+            border: 2px solid #a9cce3;
+        }
+        .target {
+            position: absolute; bottom: 0;
+            font-size: 24px;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            transform: translateX(-50%);
+        }
+        #catapult-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        
+        .solution-box {
+            background-color: #fff5f5;
+            border-left: 5px solid #ef4444;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="background-container"></div>
+
+    <div id="start-screen" class="start-screen">
+        <div class="absolute top-8 right-8 flex items-center space-x-2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-md z-10">
+            <button id="start-lang-en-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">English</button>
+            <button id="start-lang-or-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">ଓଡ଼ିଆ</button>
+            <button id="start-lang-hi-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">हिन्दी</button>
+        </div>
+        <h1 class="lang-en">10th Grade Math</h1>
+        <p class="text-xl mb-12 lang-en">The Next Level of Adventure!</p>
+        <button id="play-now-btn" class="play-now-btn lang-en">Play Now</button>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app-container" class="hidden min-h-screen p-4 sm:p-6 lg:p-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 id="platform-title" class="text-3xl md:text-4xl font-bold text-white text-shadow"></h1>
+            <div class="flex items-center space-x-2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-md">
+                <button id="lang-en-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">English</button>
+                <button id="lang-or-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">ଓଡ଼ିଆ</button>
+                <button id="lang-hi-btn" class="px-4 py-2 rounded-full text-sm font-semibold text-gray-600">हिन्दी</button>
+            </div>
+        </header>
+        <main id="main-content"></main>
+    </div>
+
+    <!-- Game Modal -->
+    <div id="game-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal">
+        <div class="modal-content w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl p-6 relative flex flex-col">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                <h2 id="game-title" class="text-3xl font-bold text-emerald-700">Game Title</h2>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-red-600 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="game-content" class="flex-grow mt-4 overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            function createBackground() {
+                const bgContainer = document.getElementById('background-container');
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute('width', '100%');
+                svg.setAttribute('height', '100%');
+                svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+                // Clouds
+                for (let i = 0; i < 15; i++) {
+                    const circle = document.createElementNS(svgNS, "circle");
+                    circle.setAttribute('cx', ${Math.random() * 100}%);
+                    circle.setAttribute('cy', ${Math.random() * 40}%);
+                    circle.setAttribute('r', ${Math.random() * 50 + 20});
+                    circle.setAttribute('fill', 'rgba(255, 255, 255, 0.2)');
+                    circle.style.filter = 'blur(15px)';
+                    svg.appendChild(circle);
+                }
+                // Floating Islands - NOW ANIMATED!
+                const islandColors = ['#8B4513', '#A0522D', '#D2691E'];
+                for (let i = 0; i < 5; i++) {
+                    const path = document.createElementNS(svgNS, "path");
+                    const x = Math.random() * 80 + 10;
+                    const y = Math.random() * 60 + 20;
+                    const d = M ${x-5} ${y} C ${x-10} ${y+10}, ${x+10} ${y+10}, ${x+5} ${y} Z;
+                    path.setAttribute('d', d);
+                    path.setAttribute('fill', islandColors[i % 3]);
+                    path.style.filter = 'drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4))';
+                    path.classList.add('floating-island'); // Add class for animation
+                    path.style.animationDelay = ${i * 1.2}s; // Stagger animations
+                    svg.appendChild(path);
+                }
+                bgContainer.appendChild(svg);
+            }
+
+            let currentLanguage = 'hi'; // Default to Hindi
+            const textContent = {
+                platformTitle: { en: '10th Grade Math', or: 'ଦଶମ ଶ୍ରେଣୀ ଗଣିତ', hi: 'कक्षा 10 गणित' },
+                chapters: [
+                    // Algebra
+                    { id: 'alg1', title: { en: 'Linear Simultaneous Equations', or: 'ସରଳ ସହସମୀକରଣ', hi: 'रैखिक युगपत समीकरण' }, color: 'bg-blue-500', units: [{ id: 'u_alg1', game: 'equationBalancer' }] },
+                    { id: 'alg2', title: { en: 'Quadratic Equation', or: 'ଦ୍ବିଘାତ ସମୀକରଣ', hi: 'द्विघात समीकरण' }, color: 'bg-green-500', units: [{ id: 'u_alg2', game: 'quadraticCatapult' }] },
+                    { id: 'alg3', title: { en: 'Arithmetic Progression', or: 'ସମାନ୍ତର ପ୍ରଗତି', hi: 'समांतर श्रेढ़ी' }, color: 'bg-yellow-500', units: [{ id: 'u_alg3', game: 'progressionPath' }] },
+                    { id: 'alg4', title: { en: 'Probability', or: 'ସମ୍ଭାବ୍ୟତା', hi: 'प्रायिकता' }, color: 'bg-purple-500', units: [{ id: 'u_alg4', game: 'probabilitySpinner' }] },
+                    { id: 'alg5', title: { en: 'Statistics', or: 'ପରିସଂଖ୍ୟାନ', hi: 'सांख्यिकी' }, color: 'bg-pink-500', units: [{ id: 'u_alg5', game: 'dataDetective' }] },
+                    { id: 'alg6', title: { en: 'Coordinate Geometry', or: 'ସ୍ଥାନାଙ୍କ ଜ୍ୟାମିତି', hi: 'निर्देशांक ज्यामिति' }, color: 'bg-indigo-500', units: [{ id: 'u_alg6', game: 'distanceDash' }] },
+                    { id: 'alg7', title: { en: 'Road Safety Education', or: 'ସଡ଼କ ସୁରକ୍ଷା ଶିକ୍ଷା', hi: 'सड़क सुरक्षा शिक्षा' }, color: 'bg-red-500', units: [{ id: 'u_alg7', game: 'safeStopChallenge' }] },
+                    // Geometry
+                    { id: 'geo1', title: { en: 'Similarity', or: 'ଜ୍ୟାମିତିରେ ସାଦୃଶ୍ୟ', hi: 'समरूपता' }, color: 'bg-orange-500', units: [{ id: 'u_geo1', game: 'scaleFactorSurveyor' }] },
+                    { id: 'geo2', title: { en: 'Circle', or: 'ବୃତ୍ତ', hi: 'वृत्त' }, color: 'bg-cyan-500', units: [{ id: 'u_geo2', game: 'arcAngleArcher' }] },
+                    { id: 'geo3', title: { en: 'Tangent to a Circle', or: 'ବୃତ୍ତର ସ୍ପର୍ଶକ', hi: 'वृत्त की स्पर्श रेखा' }, color: 'bg-lime-500', units: [{ id: 'u_geo3', game: 'tangentTracer' }] },
+                    { id: 'geo4', title: { en: 'Trigonometry', or: 'ତ୍ରିକୋଣମିତି', hi: 'त्रिकोणमिति' }, color: 'bg-fuchsia-500', units: [{ id: 'u_geo4', game: 'trigTower' }] },
+                    { id: 'geo5', title: { en: 'Mensuration', or: 'ପରିମିତି', hi: 'क्षेत्रमिति' }, color: 'bg-rose-500', units: [{ id: 'u_geo5', game: 'volumeVoyage' }] },
+                    { id: 'geo6', title: { en: 'Constructions', or: 'ଅଙ୍କନ', hi: 'रचनाएँ' }, color: 'bg-sky-500', units: [{ id: 'u_geo6', game: 'constructionCrew' }] }
+                ]
+            };
+            
+            const gameData = {
+                checkAnswer: { en: 'Check', or: 'ଯାଞ୍ଚ କରନ୍ତୁ', hi: 'जाँच करें' },
+                correct: { en: 'Correct!', or: 'ଠିକ୍ ଅଛି!', hi: 'सही है!' },
+                tryAgain: { en: 'Incorrect. Let\'s review!', or: 'ଭୁଲ ଅଛି। ଆସନ୍ତୁ ଦେଖିବା!', hi: 'गलत। आइए समीक्षा करें!' },
+                next: { en: 'Next', or: 'ପରବର୍ତ୍ତୀ', hi: 'अगला' },
+                hit: { en: 'Hit!', or: 'ହିଟ୍!', hi: 'निशाना लगा!' },
+                solutionTitle: { en: 'Here\'s the method:', or: 'ଏଠାରେ ପ୍ରଣାଳୀ ଦିଆଗଲା:', hi: 'यहाँ विधि है:' },
+                correctAnswerIs: { en: 'The correct answer is', or: 'ସଠିକ୍ ଉତ୍ତର ହେଉଛି', hi: 'सही उत्तर है' },
+                nextQuestion: { en: 'Next Question', or: 'ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ', hi: 'अगला प्रश्न' },
+                equationBalancer: { instruction: { en: 'Find the values of X and Y to balance the equations!', or: 'ସମୀକରଣକୁ ସନ୍ତୁଳିତ କରିବା ପାଇଁ X ଏବଂ Yର ମୂଲ୍ୟ ଖୋଜନ୍ତୁ!', hi: 'समीकरणों को संतुलित करने के लिए X और Y का मान ज्ञात कीजिए!' } },
+                quadraticCatapult: { instruction: { en: 'Find a root of the equation to launch the catapult and hit a target!', or: 'କେଟାପଲ୍ଟ ଲଞ୍ଚ କରିବା ଏବଂ ଲକ୍ଷ୍ୟକୁ ମାରିବା ପାଇଁ ସମୀକରଣର ଏକ ମୂଳ ଖୋଜନ୍ତୁ!', hi: 'गुलेल लॉन्च करने और लक्ष्य को भेदने के लिए समीकरण का एक मूल ज्ञात कीजिए!' }, launch: { en: 'Launch!', or: 'ଲଞ୍ଚ କରନ୍ତୁ!', hi: 'लांच!' } },
+                progressionPath: { instruction: { en: 'Find the next number in the Arithmetic Progression to help the frog cross!', or: 'ଏରିଥମେଟିକ୍ ପ୍ରୋଗ୍ରେସନରେ ପରବର୍ତ୍ତୀ ସଂଖ୍ୟା ଖୋଜି ବେଙ୍ଗକୁ ପାରି ହେବାରେ ସାହାଯ୍ୟ କରନ୍ତୁ!', hi: 'मेंढक को पार करने में मदद करने के लिए समांतर श्रेढ़ी में अगली संख्या ज्ञात कीजिए!' } },
+                probabilitySpinner: { instruction: { en: 'Find the probability of landing on Red. Simplify your fraction.', or: 'ଲାଲ୍ ଉପରେ ଅବତରଣ କରିବାର ସମ୍ଭାବନା ଖୋଜନ୍ତୁ | ଆପଣଙ୍କର ଭଗ୍ନାଂଶକୁ ସରଳ କରନ୍ତୁ |', hi: 'लाल पर आने की प्रायिकता ज्ञात कीजिए। अपने भिन्न को सरल कीजिए।' }, numerator: { en: 'Numerator', or: 'ଲବ', hi: 'अंश' }, denominator: { en: 'Denominator', or: 'ହର', hi: 'हर' } },
+                dataDetective: { instruction: { en: 'Be a Data Detective! Find the Median of this dataset.', or: 'ଏକ ଡାଟା ଡିଟେକ୍ଟିଭ୍ ହୁଅନ୍ତୁ! ଏହି ଡାଟାସେଟର ମଧ୍ୟମା ଖୋଜନ୍ତୁ।', hi: 'एक डेटा जासूस बनें! इस डेटासेट का माध्यिका ज्ञात कीजिए।' } },
+                distanceDash: { instruction: { en: 'Calculate the distance between the two points.', or: 'ଦୁଇଟି ବିନ୍ଦୁ ମଧ୍ୟରେ ଦୂରତା ଗଣନା କରନ୍ତୁ।', hi: 'दो बिंदुओं के बीच की दूरी की गणना करें।' } },
+                safeStopChallenge: { instruction: { en: 'A car is moving at the speed shown. Calculate the total stopping distance in meters. (Round to nearest whole number)', or: 'ଏକ କାର୍ ଦେଖାଯାଇଥିବା ଗତିରେ ଯାଉଛି। ମିଟରରେ ମୋଟ ଅଟକିବା ଦୂରତା ଗଣନା କରନ୍ତୁ। (ନିକଟତମ ପୂର୍ଣ୍ଣ ସଂଖ୍ୟାକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'एक कार दिखाई गई गति से चल रही है। मीटर में कुल रुकने की दूरी की गणना करें। (निकटतम पूर्ण संख्या तक पूर्णांकित करें)' } },
+                scaleFactorSurveyor: { instruction: { en: 'Help the surveyor find the length of side X using similar triangles.', or: 'ସର୍ବେକ୍ଷକଙ୍କୁ ସମାନ ତ୍ରିଭୁଜ ବ୍ୟବହାର କରି X ପାର୍ଶ୍ଵର ଦୈର୍ଘ୍ୟ ଖୋଜିବାରେ ସାହାଯ୍ୟ କରନ୍ତୁ।', hi: 'समरूप त्रिभुजों का उपयोग करके भुजा X की लंबाई ज्ञात करने में सर्वेक्षक की सहायता करें।' } },
+                arcAngleArcher: { instruction: { en: 'An archer hits a target. Given the radius and arc length, find the central angle θ. (Use π ≈ 3.14 and round to nearest degree)', or: 'ଜଣେ ଧନୁର୍ଦ୍ଧର ଏକ ଲକ୍ଷ୍ୟକୁ ମାରନ୍ତି। ବ୍ୟାସାର୍ଦ୍ଧ ଏବଂ ଚାପ ଦୈର୍ଘ୍ୟ ଦିଆଯାଇ, କେନ୍ଦ୍ରୀୟ କୋଣ θ ଖୋଜନ୍ତୁ। (π ≈ 3.14 ବ୍ୟବହାର କରନ୍ତୁ ଏବଂ ନିକଟତମ ଡିଗ୍ରୀକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'एक तीरंदाज एक लक्ष्य को भेदता है। त्रिज्या और चाप की लंबाई को देखते हुए, केंद्रीय कोण θ ज्ञात कीजिए। (π ≈ 3.14 का उपयोग करें और निकटतम डिग्री तक पूर्णांकित करें)' } },
+                tangentTracer: { instruction: { en: 'Find the length of the tangent (t) from the point to the circle.', or: 'ବିନ୍ଦୁରୁ ବୃତ୍ତ ପର୍ଯ୍ୟନ୍ତ ସ୍ପର୍ଶକ (t)ର ଦୈର୍ଘ୍ୟ ଖୋଜନ୍ତୁ।', hi: 'बिंदु से वृत्त तक स्पर्श रेखा (t) की लंबाई ज्ञात कीजिए।' } },
+                trigTower: { instruction: { en: 'Find the height (h) of the tower. (Round to the nearest whole number)', or: 'ଟାୱାରର ଉଚ୍ଚତା (h) ଖୋଜନ୍ତୁ। (ନିକଟତମ ପୂର୍ଣ୍ଣ ସଂଖ୍ୟାକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'टॉवर की ऊँचाई (h) ज्ञात कीजिए। (निकटतम पूर्ण संख्या तक पूर्णांकित करें)' } },
+                volumeVoyage: { instruction: { en: 'Find the volume of the cylinder. (Use π ≈ 3.14 and round to the nearest whole number)', or: 'ସିଲିଣ୍ଡରର ଆୟତନ ଖୋଜନ୍ତୁ। (π ≈ 3.14 ବ୍ୟବହାର କରନ୍ତୁ ଏବଂ ନିକଟତମ ପୂର୍ଣ୍ଣ ସଂଖ୍ୟାକୁ ରାଉଣ୍ଡ କରନ୍ତୁ)', hi: 'सिलेंडर का आयतन ज्ञात कीजिए। (π ≈ 3.14 का उपयोग करें और निकटतम पूर्ण संख्या तक पूर्णांकित करें)' } },
+                constructionCrew: { instruction: { en: 'You are bisecting an angle. What is the correct next step?', or: 'ଆପଣ ଏକ କୋଣକୁ ଦ୍ୱିଖଣ୍ଡିତ କରୁଛନ୍ତି। ପରବର୍ତ୍ତୀ ସଠିକ୍ ପଦକ୍ଷେପ କ’ଣ?', hi: 'आप एक कोण का समद्विभाजन कर रहे हैं। अगला सही कदम क्या है?' } }
+            };
+
+            const mainContent = document.getElementById('main-content');
+            const gameModal = document.getElementById('game-modal');
+            const gameTitle = document.getElementById('game-title');
+            const gameContent = document.getElementById('game-content');
+            let activeGame = null;
+
+            function renderChapters() {
+                mainContent.innerHTML = `
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8 overflow-y-auto h-[calc(100vh-120px)] pb-12 pr-4">
+                        ${textContent.chapters.map(chapter => {
+                            const unit = chapter.units[0];
+                            return `
+                            <div data-game="${unit.game}" data-chapter-id="${chapter.id}" class="chapter-card ${chapter.color}">
+                                <div class="text-white">
+                                    <h2 class="text-xl lg:text-2xl font-bold mb-2 chapter-title lang-${currentLanguage}">${chapter.title[currentLanguage]}</h2>
+                                </div>
+                            </div>
+                            `}).join('')}
+                    </div>
+                `;
+            }
+
+             const games = {
+                equationBalancer: {
+                    currentQuestion: null,
+                    generateData() { const x = Math.floor(Math.random() * 8) + 1; const y = Math.floor(Math.random() * 8) + 1; const a = 2; const b = 1; this.currentQuestion = { eq1: ${a}x + ${b}y = ${a * x + b * y}, eq2: x + y = ${x + y}, solution: { x, y } }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { solution } = this.currentQuestion; return { en: Use substitution. From <b>y = ${solution.x + solution.y} - x</b>, substitute into the first equation: <b>2x + (${solution.x + solution.y} - x) = ${2*solution.x + solution.y}</b>. This gives <b>x = ${solution.x}</b>. Then find y., or: ପ୍ରତିସ୍ଥାପନ ବ୍ୟବହାର କରନ୍ତୁ। <b>y = ${solution.x + solution.y} - x</b> ରୁ, ପ୍ରଥମ ସମୀକରଣରେ ପ୍ରତିସ୍ଥାପନ କରନ୍ତୁ: <b>2x + (${solution.x + solution.y} - x) = ${2*solution.x + solution.y}</b>। ଏହା <b>x = ${solution.x}</b> ଦିଏ। ତା'ପରେ y ଖୋଜନ୍ତୁ।, hi: प्रतिस्थापन का प्रयोग करें। <b>y = ${solution.x + solution.y} - x</b> से, पहले समीकरण में प्रतिस्थापित करें: <b>2x + (${solution.x + solution.y} - x) = ${2*solution.x + solution.y}</b>। इससे <b>x = ${solution.x}</b> मिलता है। फिर y ज्ञात करें।, answer: x=${solution.x}, y=${solution.y} }; },
+                    init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg1');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `
+                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.equationBalancer.instruction[currentLanguage]}</p>
+                            <div class="space-y-4 my-6">
+                               <div class="equation-box p-4 rounded-lg text-2xl text-center">${question.eq1}</div>
+                               <div class="equation-box p-4 rounded-lg text-2xl text-center">${question.eq2}</div>
+                            </div>
+                            <div class="flex justify-center items-center gap-4">
+                                <span class="text-xl font-bold">x=</span><input id="x-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" />
+                                <span class="text-xl font-bold">y=</span><input id="y-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" />
+                                <button id="check-btn" class="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
+                            </div>
+                            <div id="feedback-container" class="text-center mt-6"></div>
+                        `;
+                        document.getElementById('check-btn').addEventListener('click', () => {
+                            const x = document.getElementById('x-answer').value;
+                            const y = document.getElementById('y-answer').value;
+                            showFeedback(parseInt(x) === this.currentQuestion.solution.x && parseInt(y) === this.currentQuestion.solution.y, () => this.init());
+                        });
+                    }
+                },
+                quadraticCatapult: {
+                    currentQuestion: null,
+                    generateData() { const r1 = Math.floor(Math.random() * 4) + 1; const r2 = Math.floor(Math.random() * 5) + 5; this.currentQuestion = { equation: x² - ${r1 + r2}x + ${r1 * r2} = 0, roots: [r1, r2], sum: r1 + r2, product: r1 * r2, }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { sum, product, roots } = this.currentQuestion; return { en: Factor the equation. Find two numbers that add to <b>${sum}</b> and multiply to <b>${product}</b>. The numbers are ${roots[0]} and ${roots[1]}. So, <b>(x - ${roots[0]})(x - ${roots[1]}) = 0</b>., or: ସମୀକରଣକୁ ଫ୍ୟାକ୍ଟର୍ କରନ୍ତୁ। ଦୁଇଟି ସଂଖ୍ୟା ଖୋଜନ୍ତୁ ଯାହାର ଯୋଗଫଳ <b>${sum}</b> ଏବଂ ଗୁଣଫଳ <b>${product}</b>। ସଂଖ୍ୟାଗୁଡ଼ିକ ହେଉଛି ${roots[0]} ଏବଂ ${roots[1]}। ତେଣୁ, <b>(x - ${roots[0]})(x - ${roots[1]}) = 0</b>।, hi: समीकरण का गुणनखंड करें। ऐसी दो संख्याएँ ज्ञात करें जिनका योग <b>${sum}</b> हो और गुणनफल <b>${product}</b> हो। संख्याएँ ${roots[0]} और ${roots[1]} हैं। तो, <b>(x - ${roots[0]})(x - ${roots[1]}) = 0</b>।, answer: ${roots[0]} or ${roots[1]} }; },
+                    animateProjectile(hitRoot) { const canvas = document.getElementById('catapult-canvas'); if (!canvas) return; const ctx = canvas.getContext('2d'); const w = canvas.width, h = canvas.height; ctx.clearRect(0, 0, w, h); const startX = 20, startY = h - 20; const targetX = (hitRoot / 10) * w; const controlY = -h/2; let progress = 0; const animation = () => { progress += 0.02; if (progress > 1) { showFeedback(true, () => this.init(), gameData.hit[currentLanguage]); return; } const x = startX + (targetX - startX) * progress; const y = startY + 4 * (startY - controlY) * (progress - progress * progress); ctx.clearRect(0, 0, w, h); ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.fillStyle = '#34495e'; ctx.fill(); requestAnimationFrame(animation); }; animation(); },
+                    init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg2');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `
+                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.quadraticCatapult.instruction[currentLanguage]}</p>
+                             <div class="equation-box p-4 rounded-lg text-2xl text-center font-bold my-4">${question.equation}</div>
+                            <div class="catapult-game p-4">
+                                <canvas id="catapult-canvas" width="600" height="300"></canvas>
+                                <div class="target" style="left: ${question.roots[0] * 10}%;">🎯</div>
+                                <div class="target" style="left: ${question.roots[1] * 10}%;">🎯</div>
+                            </div>
+                             <div class="flex justify-center items-center gap-4 mt-4">
+                                <span class="text-xl font-bold">Root =</span><input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" />
+                                <button id="check-btn" class="px-6 py-3 bg-green-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.quadraticCatapult.launch[currentLanguage]}</button>
+                            </div>
+                            <div id="feedback-container" class="text-center mt-6"></div>
+                        `;
+                        const gameArea = gameContent.querySelector('.catapult-game'); const canvas = document.getElementById('catapult-canvas'); if (gameArea && canvas) { canvas.width = gameArea.clientWidth; canvas.height = gameArea.clientHeight; }
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = parseInt(document.getElementById('game-answer').value); if (this.currentQuestion.roots.includes(ans)) { document.getElementById('check-btn').disabled = true; this.animateProjectile(ans); } else { showFeedback(false, () => this.init()); } });
+                    }
+                },
+                progressionPath: {
+                    currentQuestion: null,
+                    generateData() { const start = Math.floor(Math.random() * 10) + 1; const diff = Math.floor(Math.random() * 5) + 2; this.currentQuestion = { terms: [start, start + diff, start + diff * 2], answer: start + diff * 3, diff: diff, }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { terms, diff, answer } = this.currentQuestion; return { en: Find the common difference: <b>${terms[1]} - ${terms[0]} = ${diff}</b>. Add it to the last term: <b>${terms[2]} + ${diff} = ${answer}</b>., or: ସାଧାରଣ ଅନ୍ତର ଖୋଜନ୍ତୁ: <b>${terms[1]} - ${terms[0]} = ${diff}</b>। ଏହାକୁ ଶେଷ ପଦରେ ଯୋଗ କରନ୍ତୁ: <b>${terms[2]} + ${diff} = ${answer}</b>।, hi: सार्व अंतर ज्ञात कीजिए: <b>${terms[1]} - ${terms[0]} = ${diff}</b>। इसे अंतिम पद में जोड़ें: <b>${terms[2]} + ${diff} = ${answer}</b>।, answer: answer }; },
+                   init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg3');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `
+                            <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.progressionPath.instruction[currentLanguage]}</p>
+                            <div class="flex justify-center items-center gap-4 text-3xl font-bold my-8">
+                                <span>🐸</span>
+                                ${question.terms.map(t => <span class="p-4 bg-green-200 rounded-full">${t}</span>).join('')}
+                                <span class="p-4 bg-gray-300 rounded-full">?</span>
+                                <span>🏁</span>
+                            </div>
+                             <div class="flex justify-center items-center gap-4 mt-4">
+                                <input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" />
+                                <button id="check-btn" class="px-6 py-3 bg-yellow-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button>
+                            </div>
+                            <div id="feedback-container" class="text-center mt-6"></div>
+                        `;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                probabilitySpinner: {
+                    currentQuestion: null,
+                    gcd(a, b) { return b === 0 ? a : this.gcd(b, a % b); },
+                    generateData() { const slices = [ { color: '#3498db', name: 'Blue', count: Math.ceil(Math.random() * 4) }, { color: '#e74c3c', name: 'Red', count: Math.ceil(Math.random() * 4) }, { color: '#2ecc71', name: 'Green', count: Math.ceil(Math.random() * 4) } ]; const total = slices.reduce((sum, s) => sum + s.count, 0); const target = slices[1]; const commonDivisor = this.gcd(target.count, total); this.currentQuestion = { slices, total, targetCount: target.count, answer: { num: target.count / commonDivisor, den: total / commonDivisor } }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { total, targetCount, answer } = this.currentQuestion; return { en: Probability is (Favorable Outcomes) / (Total Outcomes). There are <b>${targetCount}</b> red slices and <b>${total}</b> total slices. The probability is <b>${targetCount}/${total}</b>, which simplifies to <b>${answer.num}/${answer.den}</b>., or: ସମ୍ଭାବ୍ୟତା ହେଉଛି (ଅନୁକୂଳ ଫଳାଫଳ) / (ମୋଟ ଫଳାଫଳ)। ଏଠାରେ <b>${targetCount}</b>ଟି ଲାଲ୍ ସ୍ଲାଇସ୍ ଏବଂ <b>${total}</b>ଟି ମୋଟ ସ୍ଲାଇସ୍ ଅଛି। ସମ୍ଭାବ୍ୟତା <b>${targetCount}/${total}</b>, ଯାହା ସରଳୀକୃତ ହୋଇ <b>${answer.num}/${answer.den}</b> ହୁଏ।, hi: प्रायिकता है (अनुकूल परिणाम) / (कुल परिणाम)। यहाँ <b>${targetCount}</b> लाल स्लाइस और <b>${total}</b> कुल स्लाइस हैं। प्रायिकता <b>${targetCount}/${total}</b> है, जिसे सरल करने पर <b>${answer.num}/${answer.den}</b> होता है।, answer: ${answer.num} / ${answer.den} }; },
+                    drawSpinner(data) { let cumulativePercent = 0; const parts = data.slices.map(slice => { const percent = (slice.count / data.total) * 100; const val = ${slice.color} ${cumulativePercent}% ${cumulativePercent + percent}%; cumulativePercent += percent; return val; }); return <div class="w-64 h-64 mx-auto my-6 rounded-full" style="background: conic-gradient(${parts.join(', ')});"></div>; },
+                    init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg4');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.probabilitySpinner.instruction[currentLanguage]}</p>${this.drawSpinner(question)}<div class="flex justify-center items-center gap-4"><span class="text-xl font-bold">${gameData.probabilitySpinner.numerator[currentLanguage]}:</span><input id="num-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" /><span class="text-xl font-bold">${gameData.probabilitySpinner.denominator[currentLanguage]}:</span><input id="den-answer" type="number" class="p-2 text-xl text-center w-20 border-2 rounded-lg" /></div><div class="flex justify-center mt-4"><button id="check-btn" class="px-6 py-3 bg-purple-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                        document.getElementById('check-btn').addEventListener('click', () => { const num = document.getElementById('num-answer').value; const den = document.getElementById('den-answer').value; showFeedback(parseInt(num) === this.currentQuestion.answer.num && parseInt(den) === this.currentQuestion.answer.den, () => this.init()); });
+                    }
+                },
+                dataDetective: {
+                    currentQuestion: null,
+                    generateData() { const data = Array.from({length: 5}, () => Math.floor(Math.random() * 30) + 1); const sorted = [...data].sort((a,b) => a - b); this.currentQuestion = { data, sortedData: sorted, answer: sorted[2] }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { data, sortedData, answer } = this.currentQuestion; return { en: First, sort the numbers: <b>${data.join(', ')}</b> becomes <b>${sortedData.join(', ')}</b>. The median is the middle number., or: ପ୍ରଥମେ, ସଂଖ୍ୟାଗୁଡ଼ିକୁ ସଜାନ୍ତୁ: <b>${data.join(', ')}</b> ହୋଇଯାଏ <b>${sortedData.join(', ')}</b>। ମଧ୍ୟମା ହେଉଛି ମଝି ସଂଖ୍ୟା।, hi: पहले, संख्याओं को क्रमबद्ध करें: <b>${data.join(', ')}</b> बन जाता है <b>${sortedData.join(', ')}</b>। माध्यिका बीच की संख्या है।, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg5');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = `<p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.dataDetective.instruction[currentLanguage]}</p><div class="flex justify-center items-center gap-4 text-3xl font-bold my-8 bg-pink-100 p-4 rounded-lg">${question.data.map(d => <span>${d}</span>).join('<span class="text-pink-300">,</span>')}</div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" placeholder="Median?"/><button id="check-btn" class="px-6 py-3 bg-pink-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>`;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                distanceDash: {
+                    currentQuestion: null,
+                    generateData() { const triples = [[3,4,5], [6,8,10], [5,12,13]]; const t = triples[Math.floor(Math.random() * triples.length)]; const p1 = { x: Math.floor(Math.random() * 5), y: Math.floor(Math.random() * 5) }; const p2 = { x: p1.x + t[0], y: p1.y + t[1] }; this.currentQuestion = { p1, p2, answer: t[2] }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { p1, p2, answer } = this.currentQuestion; return { en: Use the distance formula: <b>d = √((x₂-x₁)² + (y₂-y₁)²)</b>. This gives d = √((<b>${p2.x}</b>-<b>${p1.x}</b>)² + (<b>${p2.y}</b>-<b>${p1.y}</b>)²) = √<b>${answer**2}</b>., or: ଦୂରତା ସୂତ୍ର ବ୍ୟବହାର କରନ୍ତୁ: <b>d = √((x₂-x₁)² + (y₂-y₁)²)</b>। ଏହା ଦିଏ d = √((<b>${p2.x}</b>-<b>${p1.x}</b>)² + (<b>${p2.y}</b>-<b>${p1.y}</b>)²) = √<b>${answer**2}</b>।, hi: दूरी सूत्र का प्रयोग करें: <b>d = √((x₂-x₁)² + (y₂-y₁)²)</b>। इससे d = √((<b>${p2.x}</b>-<b>${p1.x}</b>)² + (<b>${p2.y}</b>-<b>${p1.y}</b>)²) = √<b>${answer**2}</b> मिलता है।, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg6');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.distanceDash.instruction[currentLanguage]}</p><div class="text-center text-2xl font-bold my-8 space-y-2"><p>Point A: <span class="text-indigo-600">(${question.p1.x}, ${question.p1.y})</span></p><p>Point B: <span class="text-indigo-600">(${question.p2.x}, ${question.p2.y})</span></p></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-24 border-2 rounded-lg" placeholder="Distance?"/><button id="check-btn" class="px-6 py-3 bg-indigo-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                safeStopChallenge: {
+                    currentQuestion: null,
+                    generateData() { const speed = (Math.floor(Math.random() * 5) + 4) * 10; const reactionDist = (speed / 10) * 3; const brakingDist = ((speed / 10) ** 2) / 2; const answer = Math.round(reactionDist + brakingDist); this.currentQuestion = { speed, reactionDist, brakingDist, answer }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { reactionDist, brakingDist, answer } = this.currentQuestion; return { en: Total Stopping Distance = Reaction Distance + Braking Distance. <br>Reaction ≈ (Speed/10)*3 = <b>${reactionDist.toFixed(1)}m</b>. <br>Braking ≈ (Speed/10)²/2 = <b>${brakingDist.toFixed(1)}m</b>. <br>Total ≈ <b>${(reactionDist + brakingDist).toFixed(1)}m</b>., or: ମୋଟ ଅଟକିବା ଦୂରତା = ପ୍ରତିକ୍ରିୟା ଦୂରତା + ବ୍ରେକିଂ ଦୂରତା। <br>ପ୍ରତିକ୍ରିୟା ≈ (ଗତି/10)*3 = <b>${reactionDist.toFixed(1)}m</b>। <br>ବ୍ରେକିଂ ≈ (ଗତି/10)²/2 = <b>${brakingDist.toFixed(1)}m</b>। <br>ମୋଟ ≈ <b>${(reactionDist + brakingDist).toFixed(1)}m</b>।, hi: कुल रुकने की दूरी = प्रतिक्रिया दूरी + ब्रेकिंग दूरी। <br>प्रतिक्रिया ≈ (गति/10)*3 = <b>${reactionDist.toFixed(1)}मी</b>। <br>ब्रेकिंग ≈ (गति/10)²/2 = <b>${brakingDist.toFixed(1)}मी</b>। <br>कुल ≈ <b>${(reactionDist + brakingDist).toFixed(1)}मी</b>।, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const question = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'alg7');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.safeStopChallenge.instruction[currentLanguage]}</p><div class="my-8 text-center"><span class="text-5xl font-bold text-red-600">${question.speed}</span> <span class="text-2xl">km/h</span></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="Distance (m)?"/><button id="check-btn" class="px-6 py-3 bg-red-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                scaleFactorSurveyor: {
+                    currentQuestion: null,
+                    generateData() { const scale = parseFloat((Math.random() * 1.5 + 1.5).toFixed(1)); const base1 = Math.floor(Math.random() * 5) + 4; const height1 = Math.floor(Math.random() * 5) + 3; const base2 = Math.round(base1 * scale); this.currentQuestion = { base1, height1, base2, answer: Math.round(height1 * scale) }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { base1, height1, base2, answer } = this.currentQuestion; return { en: The ratio of corresponding sides is equal. <br><b>(Height 2 / Height 1) = (Base 2 / Base 1)</b>. <br>So, <b>(X / ${height1}) = (${base2} / ${base1})</b>. <br>This gives <b>X = (${base2} / ${base1}) * ${height1}</b>., or: ଅନୁରୂପ ପାର୍ଶ୍ଵଗୁଡ଼ିକର ଅନୁପାତ ସମାନ। <br><b>(ଉଚ୍ଚତା 2 / ଉଚ୍ଚତା 1) = (ଭୂମି 2 / ଭୂମି 1)</b>। <br>ତେଣୁ, <b>(X / ${height1}) = (${base2} / ${base1})</b>। <br>ଏହା <b>X = (${base2} / ${base1}) * ${height1}</b> ଦିଏ।, hi: संगत भुजाओं का अनुपात बराबर होता है। <br><b>(ऊँचाई 2 / ऊँचाई 1) = (आधार 2 / आधार 1)</b>। <br>तो, <b>(X / ${height1}) = (${base2} / ${base1})</b>। <br>इससे <b>X = (${base2} / ${base1}) * ${height1}</b> मिलता है।, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'geo1');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.scaleFactorSurveyor.instruction[currentLanguage]}</p><div class="flex justify-around items-end my-4 h-48"><svg width="120" height="150" viewBox="0 0 120 150"><polygon points="5,145 115,145 5,5" style="fill:none;stroke:orange;stroke-width:3" /><text x="50" y="140" font-size="12" fill="black">${q.base1}</text><text x="15" y="80" font-size="12" transform="rotate(-90 15,80)" fill="black">${q.height1}</text></svg><svg width="180" height="200" viewBox="0 0 180 200"><polygon points="5,195 175,195 5,5" style="fill:none;stroke:orange;stroke-width:3" /><text x="80" y="190" font-size="12" fill="black">${q.base2}</text><text x="15" y="100" font-size="12" transform="rotate(-90 15,100)" fill="black">X</text></svg></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="Length of X?"/><button id="check-btn" class="px-6 py-3 bg-orange-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                arcAngleArcher: {
+                    currentQuestion: null,
+                    generateData() { const r = Math.floor(Math.random() * 5) + 5; const theta = [30, 45, 60, 90][Math.floor(Math.random()*4)]; const arcLength = parseFloat(((theta / 360) * 2 * 3.14 * r).toFixed(1)); this.currentQuestion = { r, arcLength, answer: theta }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { r, arcLength, answer } = this.currentQuestion; return { en: Use the formula: <b>θ = (Arc Length * 360) / (2 * π * r)</b>. <br>Plugging in the values: θ = (<b>${arcLength}</b> * 360) / (2 * 3.14 * <b>${r}</b>)., or: ସୂତ୍ର ବ୍ୟବହାର କରନ୍ତୁ: <b>θ = (ଚାପ ଦୈର୍ଘ୍ୟ * 360) / (2 * π * r)</b>। <br>ମୂଲ୍ୟଗୁଡ଼ିକୁ ସ୍ଥାପନ କଲେ: θ = (<b>${arcLength}</b> * 360) / (2 * 3.14 * <b>${r}</b>)।, hi: सूत्र का प्रयोग करें: <b>θ = (चाप की लंबाई * 360) / (2 * π * r)</b>। <br>मानों को रखने पर: θ = (<b>${arcLength}</b> * 360) / (2 * 3.14 * <b>${r}</b>)।, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'geo2');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.arcAngleArcher.instruction[currentLanguage]}</p><div class="flex justify-center items-center my-4"><svg width="200" height="200" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#ccc" stroke-width="2"/><path d="M 50 50 L 90 50 A 40 40 0 0 1 ${50 + 40*Math.cos(q.answer*Math.PI/180)} ${50 - 40*Math.sin(q.answer*Math.PI/180)} Z" fill="rgba(0,150,255,0.2)" stroke="#0096ff" stroke-width="1"/><text x="65" y="45" font-size="6">r=${q.r}</text><text x="70" y="65" font-size="6">L=${q.arcLength}</text><text x="55" y="55" font-size="6">θ=?</text></svg></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="Angle θ?"/><button id="check-btn" class="px-6 py-3 bg-cyan-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                         document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                tangentTracer: {
+                    currentQuestion: null,
+                    generateData() { const triples = [[3,4,5], [6,8,10], [5,12,13], [8,15,17]]; const t = triples[Math.floor(Math.random() * triples.length)]; this.currentQuestion = { radius: t[0], distance: t[2], answer: t[1] }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { radius, distance, answer } = this.currentQuestion; return { en: The radius and tangent are perpendicular, forming a right triangle with the distance to the center as the hypotenuse. <br>Use Pythagoras: <b>d² = r² + t²</b>. <br>So, <b>t² = d² - r² = ${distance**2} - ${radius**2} = ${answer**2}</b>. <br><b>t = √${answer**2}</b>, or: ବ୍ୟାସାର୍ଦ୍ଧ ଏବଂ ସ୍ପର୍ଶକ ଲମ୍ବ ଅଟନ୍ତି, ଯାହା କେନ୍ଦ୍ରରୁ ଦୂରତାକୁ କର୍ଣ୍ଣ ଭାବରେ ନେଇ ଏକ ସମକୋଣୀ ତ୍ରିଭୁଜ ଗଠନ କରେ। <br>ପାଇଥାଗୋରାସ୍ ବ୍ୟବହାର କରନ୍ତୁ: <b>d² = r² + t²</b>। <br>ତେଣୁ, <b>t² = d² - r² = ${distance**2} - ${radius**2} = ${answer**2}</b>। <br><b>t = √${answer**2}</b>, hi: त्रिज्या और स्पर्श रेखा लंबवत होती हैं, जो केंद्र से दूरी को कर्ण के रूप में लेकर एक समकोण त्रिभुज बनाती हैं। <br>पाइथागोरस का प्रयोग करें: <b>d² = r² + t²</b>। <br>तो, <b>t² = d² - r² = ${distance**2} - ${radius**2} = ${answer**2}</b>। <br><b>t = √${answer**2}</b>, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'geo3');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.tangentTracer.instruction[currentLanguage]}</p><div class="flex justify-center items-center my-4 h-48"><svg width="300" height="150" viewBox="0 0 200 100"><circle cx="50" cy="50" r="40" fill="rgba(190,242,100,0.3)" stroke="#84cc16" stroke-width="2"/><line x1="50" y1="50" x2="180" y2="50" stroke="#666" stroke-width="1"/><line x1="180" y1="50" x2="80" y2="80" stroke="#ef4444" stroke-width="2"/><line x1="50" y1="50" x2="80" y2="80" stroke="#84cc16" stroke-width="1"/><text x="100" y="45" font-size="8">d = ${q.distance}</text><text x="85" y="75" font-size="8" fill="#ef4444">t = ?</text><text x="60" y="60" font-size="8">r = ${q.radius}</text></svg></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="Length of t?"/><button id="check-btn" class="px-6 py-3 bg-lime-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                trigTower: {
+                    currentQuestion: null,
+                    generateData() { const angles = {30: Math.tan(30*Math.PI/180), 45: 1, 60: Math.tan(60*Math.PI/180)}; const angle = [30, 45, 60][Math.floor(Math.random()*3)]; const distance = angle === 45 ? Math.floor(Math.random()*21)+20 : 20; const height = distance * angles[angle]; this.currentQuestion = { angle, distance, answer: Math.round(height) }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { angle, distance, answer } = this.currentQuestion; return { en: Use tangent, as we have the adjacent side (distance) and want to find the opposite side (height). <br><b>tan(θ) = Opposite / Adjacent</b> <br><b>tan(${angle}°) = h / ${distance}</b> <br><b>h = ${distance} * tan(${angle}°)</b>, or: ଟାନ୍ଜେଣ୍ଟ୍ ବ୍ୟବହାର କରନ୍ତୁ, କାରଣ ଆମ ପାଖରେ ସଂଲଗ୍ନ ପାର୍ଶ୍ଵ (ଦୂରତା) ଅଛି ଏବଂ ବିପରୀତ ପାର୍ଶ୍ଵ (ଉଚ୍ଚତା) ଖୋଜିବାକୁ ଚାହୁଁଛୁ। <br><b>tan(θ) = ବିପରୀତ / ସଂଲଗ୍ନ</b> <br><b>tan(${angle}°) = h / ${distance}</b> <br><b>h = ${distance} * tan(${angle}°)</b>, hi: स्पर्शज्या का प्रयोग करें, क्योंकि हमारे पास आसन्न भुजा (दूरी) है और हम सम्मुख भुजा (ऊँचाई) ज्ञात करना चाहते हैं। <br><b>tan(θ) = सम्मुख / आसन्न</b> <br><b>tan(${angle}°) = h / ${distance}</b> <br><b>h = ${distance} * tan(${angle}°)</b>, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'geo4');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.trigTower.instruction[currentLanguage]}</p><div class="flex justify-center items-end my-4 h-48"><div class="text-center">🧍</div><div class="w-48 border-b-2 border-black border-dashed"></div><div class="text-center text-4xl">🗼</div></div><div class="text-center font-bold text-xl">d = ${q.distance}m, θ = ${q.angle}°</div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="Height (h)?"/><button id="check-btn" class="px-6 py-3 bg-fuchsia-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                volumeVoyage: {
+                    currentQuestion: null,
+                    generateData() { const r = Math.floor(Math.random() * 4) + 2; const h = Math.floor(Math.random() * 6) + 5; const volume = 3.14 * r * r * h; this.currentQuestion = { r, h, answer: Math.round(volume) }; return this.currentQuestion; },
+                    getSolutionExplanation() { const { r, h, answer } = this.currentQuestion; return { en: The formula for the volume of a cylinder is <b>V = π * r² * h</b>. <br>Plugging in the values: <br><b>V = 3.14 * ${r}² * ${h}</b> <br><b>V = 3.14 * ${r*r} * ${h}</b>, or: ସିଲିଣ୍ଡରର ଆୟତନ ପାଇଁ ସୂତ୍ର ହେଉଛି <b>V = π * r² * h</b>। <br>ମୂଲ୍ୟଗୁଡ଼ିକୁ ସ୍ଥାପନ କଲେ: <br><b>V = 3.14 * ${r}² * ${h}</b> <br><b>V = 3.14 * ${r*r} * ${h}</b>, hi: एक सिलेंडर के आयतन का सूत्र है <b>V = π * r² * h</b>। <br>मानों को रखने पर: <br><b>V = 3.14 * ${r}² * ${h}</b> <br><b>V = 3.14 * ${r*r} * ${h}</b>, answer: answer }; },
+                    init() {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'geo5');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-lg mb-4 lang-${currentLanguage}-body">${gameData.volumeVoyage.instruction[currentLanguage]}</p><div class="flex justify-center items-center my-4 h-48"><div style="width:100px; height:150px; background:#fecdd3; border:2px solid #fb7185; border-radius:50px/25px; position:relative;"><div style="position:absolute; top:-12px; left:0; width:100px; height:25px; background:#f9a8d4; border:2px solid #f472b6; border-radius:50px/12.5px;"></div></div><div class="ml-4 text-xl font-bold">r = ${q.r}<br/>h = ${q.h}</div></div><div class="flex justify-center items-center gap-4 mt-4"><input id="game-answer" type="number" class="p-2 text-xl text-center w-32 border-2 rounded-lg" placeholder="Volume?"/><button id="check-btn" class="px-6 py-3 bg-rose-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.checkAnswer[currentLanguage]}</button></div><div id="feedback-container" class="text-center mt-6"></div>;
+                        document.getElementById('check-btn').addEventListener('click', () => { const ans = document.getElementById('game-answer').value; showFeedback(parseInt(ans) === this.currentQuestion.answer, () => this.init()); });
+                    }
+                },
+                constructionCrew: { 
+                    currentQuestion: null,
+                    steps: [
+                        { 
+                            svg: '<svg viewBox="0 0 100 100"><path d="M 10 90 L 50 10 L 90 90" stroke="black" stroke-width="2" fill="none"/></svg>',
+                            options: [
+                                { en: 'Draw an arc from the vertex across both arms.', or: 'ଶୀର୍ଷରୁ ଉଭୟ ବାହୁ ଉପରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'शीर्ष से दोनों भुजाओं पर एक चाप खींचें।', correct: true},
+                                { en: 'Draw a line through the middle.', or: 'ମଝିରେ ଏକ ରେଖା ଅଙ୍କନ କରନ୍ତୁ।', hi: 'बीच में एक रेखा खींचें।', correct: false},
+                                { en: 'Measure the angle with a protractor.', or: 'ପ୍ରୋଟ୍ରାକ୍ଟରରେ କୋଣ ମାପନ୍ତୁ।', hi: 'चाँदे से कोण मापें।', correct: false},
+                            ],
+                            explanation: {
+                                en: 'The first step is always to draw an arc from the vertex that intersects both sides (arms) of the angle. This gives you two points to work from.',
+                                or: 'ପ୍ରଥମ ପଦକ୍ଷେପ ସର୍ବଦା ଶୀର୍ଷରୁ ଏକ ଚାପ ଅଙ୍କନ କରିବା ଯାହା କୋଣର ଉଭୟ ପାର୍ଶ୍ଵକୁ (ବାହୁ) ଛେଦ କରେ। ଏହା ଆପଣଙ୍କୁ କାମ କରିବା ପାଇଁ ଦୁଇଟି ବିନ୍ଦୁ ଦିଏ।',
+                                hi: 'पहला कदम हमेशा शीर्ष से एक चाप खींचना होता है जो कोण के दोनों पक्षों (भुजाओं) को काटता है। यह आपको काम करने के लिए दो बिंदु देता है।'
+                            },
+                            answer: { en: 'Draw an arc from the vertex across both arms.', or: 'ଶୀର୍ଷରୁ ଉଭୟ ବାହୁ ଉପରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'शीर्ष से दोनों भुजाओं पर एक चाप खींचें।' }
+                        },
+                        { 
+                           svg: '<svg viewBox="0 0 100 100"><path d="M 10 90 L 50 10 L 90 90" stroke="black" stroke-width="2" fill="none"/><path d="M 50 10 a 30 30 0 0 1 25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /><path d="M 50 10 a 30 30 0 0 0 -25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /></svg>',
+                            options: [
+                                { en: 'From an intersection point, draw an arc inside the angle.', or: 'ଏକ ଛେଦ ବିନ୍ଦୁରୁ, କୋଣ ଭିତରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'एक प्रतिच्छेदन बिंदु से, कोण के अंदर एक चाप खींचें।', correct: true},
+                                { en: 'Draw the same arc again.', or: 'ସେହି ଚାପକୁ ପୁଣିଥରେ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'वही चाप फिर से खींचें।', correct: false},
+                                { en: 'Connect the intersection points.', or: 'ଛେଦ ବିନ୍ଦୁଗୁଡ଼ିକୁ ସଂଯୋଗ କରନ୍ତୁ।', hi: 'प्रतिच्छेदन बिंदुओं को जोड़ें।', correct: false},
+                            ],
+                            explanation: {
+                                en: 'Place the compass on one of the points where the first arc intersected an arm, and draw another arc in the center of the angle.',
+                                or: 'ପ୍ରଥମ ଚାପ ବାହୁକୁ ଛେଦ କରିଥିବା ବିନ୍ଦୁମାନଙ୍କ ମଧ୍ୟରୁ ଗୋଟିକ ଉପରେ କମ୍ପାସ୍ ରଖନ୍ତୁ, ଏବଂ କୋଣର କେନ୍ଦ୍ରରେ ଆଉ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।',
+                                hi: 'कम्पास को उन बिंदुओं में से एक पर रखें जहां पहला चाप एक भुजा को काटता है, और कोण के केंद्र में एक और चाप खींचें।'
+                            },
+                            answer: { en: 'From an intersection point, draw an arc inside the angle.', or: 'ଏକ ଛେଦ ବିନ୍ଦୁରୁ, କୋଣ ଭିତରେ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'एक प्रतिच्छेदन बिंदु से, कोण के अंदर एक चाप खींचें।' }
+                        },
+                         { 
+                           svg: '<svg viewBox="0 0 100 100"><path d="M 10 90 L 50 10 L 90 90" stroke="black" stroke-width="2" fill="none"/><path d="M 50 10 a 30 30 0 0 1 25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /><path d="M 50 10 a 30 30 0 0 0 -25.98 15" stroke="blue" stroke-width="1.5" fill="none" stroke-dasharray="2 2" /><path d="M 24.02 25 a 30 30 0 0 1 30 0" stroke="red" stroke-width="1.5" fill="none" /></svg>',
+                            options: [
+                                { en: 'From the other intersection, draw an arc to cross the red one.', or: 'ଅନ୍ୟ ଛେଦରୁ, ଲାଲ୍ ଚାପକୁ ଛେଦ କରିବା ପାଇଁ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'दूसरे प्रतिच्छेदन से, लाल वाले को पार करने के लिए एक चाप खींचें।', correct: true},
+                                { en: 'Draw a line from the vertex to the red arc.', or: 'ଶୀର୍ଷରୁ ଲାଲ୍ ଚାପ ପର୍ଯ୍ୟନ୍ତ ଏକ ରେଖା ଅଙ୍କନ କରନ୍ତୁ।', hi: 'शीर्ष से लाल चाप तक एक रेखा खींचें।', correct: false},
+                                { en: 'Erase the blue arc.', or: 'ନୀଳ ଚାପକୁ ଲିଭାନ୍ତୁ।', hi: 'नीले चाप को मिटा दें।', correct: false},
+                            ],
+                             explanation: {
+                                en: "Without changing the compass width, move to the other intersection point (on the other arm) and draw a second arc that crosses the first one you just drew.",
+                                or: 'କମ୍ପାସର ପ୍ରସ୍ଥ ପରିବର୍ତ୍ତନ ନକରି, ଅନ୍ୟ ଛେଦ ବିନ୍ଦୁକୁ (ଅନ୍ୟ ବାହୁ ଉପରେ) ଯାଆନ୍ତୁ ଏବଂ ଆପଣ ଅଙ୍କନ କରିଥିବା ପ୍ରଥମ ଚାପକୁ ଛେଦ କରୁଥିବା ଦ୍ୱିତୀୟ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।',
+                                hi: 'कम्पास की चौड़ाई को बदले बिना, दूसरे प्रतिच्छेदन बिंदु (दूसरी भुजा पर) पर जाएं और एक दूसरा चाप खींचें जो आपके द्वारा अभी खींचे गए पहले चाप को काटता है।'
+                            },
+                            answer: { en: 'From the other intersection, draw an arc to cross the red one.', or: 'ଅନ୍ୟ ଛେଦରୁ, ଲାଲ୍ ଚାପକୁ ଛେଦ କରିବା ପାଇଁ ଏକ ଚାପ ଅଙ୍କନ କରନ୍ତୁ।', hi: 'दूसरे प्रतिच्छेदन से, लाल वाले को पार करने के लिए एक चाप खींचें।' }
+                        }
+                    ],
+                    shuffle(array) { let c = array.length, r, t; while (c !== 0) { r = Math.floor(Math.random() * c); c--; t = array[c]; array[c] = array[r]; array[r] = t; } return array; },
+                    generateData() { this.currentQuestion = this.steps[Math.floor(Math.random() * this.steps.length)]; return this.currentQuestion; },
+                    getSolutionExplanation() { const { explanation, answer } = this.currentQuestion; return { en: explanation.en, or: explanation.or, hi: explanation.hi, answer: answer[currentLanguage] }; },
+                    init() {
+                        activeGame = this;
+                        const q = this.generateData();
+                        const gameInfo = textContent.chapters.find(c => c.id === 'geo6');
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        const shuffledOptions = this.shuffle([...q.options]);
+                        gameContent.innerHTML = `
+                            <p class="text-center text-lg mb-2 lang-${currentLanguage}-body">${gameData.constructionCrew.instruction[currentLanguage]}</p>
+                            <div class="flex justify-center items-center my-2 h-48 border rounded-lg bg-sky-50">${q.svg}</div>
+                            <div class="grid grid-cols-1 gap-3 mt-4">
+                                ${shuffledOptions.map(opt => <button class="game-option-btn p-3 text-left rounded-lg lang-${currentLanguage}-body" data-correct="${opt.correct}">${opt[currentLanguage]}</button>).join('')}
+                            </div>
+                            <div id="feedback-container" class="text-center mt-6"></div>`;
+                        gameContent.querySelectorAll('.game-option-btn').forEach(btn => btn.addEventListener('click', e => { showFeedback(e.currentTarget.dataset.correct === 'true', () => this.init()); }));
+                    }
+                },
+                comingSoon: {
+                    init(chapterId) {
+                        const gameInfo = textContent.chapters.find(c => c.id === chapterId);
+                        gameTitle.textContent = gameInfo.title[currentLanguage];
+                        gameContent.innerHTML = <p class="text-center text-2xl p-8 lang-${currentLanguage}-body">${currentLanguage === 'en' ? 'This game is under construction. Check back later!' : (currentLanguage === 'or' ? 'ଏହି ଖେଳ ନିର୍ମାଣାଧୀନ ଅଛି | ପରେ ପୁଣି ଦେଖନ୍ତୁ!' : 'यह गेम निर्माणाधीन है। बाद में फिर देखें!')}</p>;
+                    }
+                }
+            };
+            
+            function showFeedback(isCorrect, nextCallback, message) {
+                const feedbackContainer = document.getElementById('feedback-container');
+                if (!feedbackContainer) return;
+
+                gameContent.querySelectorAll('button, input').forEach(el => el.disabled = true);
+                
+                if (isCorrect) {
+                    feedbackContainer.innerHTML = <p class="text-2xl font-bold text-green-600">${message || gameData.correct[currentLanguage]}</p>;
+                    setTimeout(() => { 
+                        if (gameModal.classList.contains('hidden')) return;
+                        if(nextCallback) nextCallback(); 
+                        if(feedbackContainer) feedbackContainer.innerHTML = '';
+                    }, 1500);
+                } else {
+                    const solution = activeGame.getSolutionExplanation();
+                    feedbackContainer.innerHTML = `
+                        <p class="text-2xl font-bold text-red-600 mb-4">${gameData.tryAgain[currentLanguage]}</p>
+                        <div class="solution-box text-left">
+                            <h3 class="font-bold text-lg mb-2">${gameData.solutionTitle[currentLanguage]}</h3>
+                            <p class="text-gray-700 lang-${currentLanguage}-body">${solution[currentLanguage]}</p>
+                            <p class="mt-3"><b>${gameData.correctAnswerIs[currentLanguage]}: <span class="text-blue-600">${solution.answer}</span></b></p>
+                            <button id="next-q-btn" class="mt-4 w-full px-6 py-3 bg-blue-500 text-white font-bold rounded-lg lang-${currentLanguage}">${gameData.nextQuestion[currentLanguage]}</button>
+                        </div>`;
+
+                    document.getElementById('next-q-btn').addEventListener('click', () => {
+                        if (nextCallback) nextCallback();
+                    });
+                }
+            }
+            
+            function updateLanguage() {
+                document.querySelectorAll('[id^="platform-title"], .chapter-title, .lang-en, .lang-or, .lang-hi, .lang-or-body, .lang-hi-body').forEach(el => {
+                    el.classList.remove('lang-en', 'lang-or', 'lang-hi', 'lang-or-body', 'lang-hi-body');
+                    if (el.classList.contains('chapter-title') || el.tagName === 'H1' || el.tagName === 'H2' || el.classList.contains('play-now-btn')) {
+                         el.classList.add(lang-${currentLanguage});
+                    } else {
+                         el.classList.add(lang-${currentLanguage}-body);
+                    }
+                });
+                
+                document.getElementById('platform-title').textContent = textContent.platformTitle[currentLanguage];
+                document.querySelector('#start-screen h1').textContent = {en: '10th Grade Math', or: 'ଦଶମ ଶ୍ରେଣୀ ଗଣିତ', hi: 'कक्षा 10 गणित'}[currentLanguage];
+                document.querySelector('#start-screen p').textContent = {en: 'The Next Level of Adventure!', or: 'ସାହସିକତାର ପରବର୍ତ୍ତୀ ସ୍ତର!', hi: 'साहसिक कार्य का अगला स्तर!'}[currentLanguage];
+                document.getElementById('play-now-btn').textContent = {en: 'Play Now', or: 'ଏବେ ଖେଳନ୍ତୁ', hi: 'अब खेलें'}[currentLanguage];
+                
+                renderChapters();
+
+                const langEnBtn = document.getElementById('lang-en-btn');
+                const langOrBtn = document.getEl
